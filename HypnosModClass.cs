@@ -16,8 +16,18 @@ namespace Hypnos
 		public override void PostSetupContent()
 		{
 
-            Mod cal = ModLoader.GetMod("CalamityMod");
-            cal.Call("DeclareOneToManyRelationshipForHealthBar", ModContent.NPCType<HypnosBoss>(), ModContent.NPCType<HypnosPlug>());
+			Mod cal = ModLoader.GetMod("CalamityMod");
+			cal.Call("DeclareOneToManyRelationshipForHealthBar", ModContent.NPCType<HypnosBoss>(), ModContent.NPCType<HypnosPlug>());
+			List<(int, int, Action<int>, int, bool, float, int[], int[])> brEntries = (List<(int, int, Action<int>, int, bool, float, int[], int[])>)cal.Call("GetBossRushEntries");
+			int[] excIDs = { ModContent.NPCType<AergiaNeuron>(), ModContent.NPCType<HypnosPlug>() };
+			int[] headID = { ModContent.NPCType<HypnosBoss>() };
+			Action<int> pr = delegate (int npc) 
+			{
+				NPC.SpawnOnPlayer(CalamityMod.Events.BossRushEvent.ClosestPlayerToWorldCenter, ModContent.NPCType<HypnosBoss>()); 
+			};
+			brEntries.Insert(brEntries.Count() - 2, (ModContent.NPCType<HypnosBoss>(), -1, pr, 180, false, 0f, excIDs, headID));
+			cal.Call("SetBossRushEntries", brEntries);
+
 			{
 				Mod bossChecklist;
 				ModLoader.TryGetMod("BossChecklist", out bossChecklist);

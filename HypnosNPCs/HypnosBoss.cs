@@ -27,6 +27,7 @@ using CalamityMod.Items.Weapons.DraedonsArsenal;
 using Hypnos.Items;
 using Hypnos.Projectiles;
 using Terraria.GameContent.ItemDropRules;
+using Terraria.Audio;
 
 namespace Hypnos.HypnosNPCs
 {
@@ -65,7 +66,6 @@ namespace Hypnos.HypnosNPCs
             NPC.LifeMaxNERB(1320000, 1980000);
             double HPBoost = CalamityConfig.Instance.BossHealthBoost * 0.01;
             NPC.lifeMax += (int)(NPC.lifeMax * HPBoost);
-            NPC.HitSound = SoundID.NPCHit4;
             NPC.DeathSound = SoundID.Item14;
             NPC.knockBackResist = 0f;
             NPC.noTileCollide = true;
@@ -75,7 +75,7 @@ namespace Hypnos.HypnosNPCs
             NPC.dontTakeDamage = true;
             NPC.damage = 1;
             NPC.defense = 90;
-            Music = MusicID.Boss3;
+            Music = MusicLoader.GetMusicSlot(Mod, "Sounds/Music/HypnosSong");
         }
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
@@ -96,11 +96,6 @@ namespace Hypnos.HypnosNPCs
             //Boss zen
             Main.player[Main.myPlayer].Calamity().isNearbyBoss = true;
             Main.player[Main.myPlayer].AddBuff(ModContent.BuffType<CalamityMod.Buffs.StatBuffs.BossEffects>(), 10, true);
-            //KILL the exo chair
-            if (Main.player[Main.myPlayer].mount.Type == ModContent.MountType<CalamityMod.Items.Mounts.DraedonGamerChairMount>())
-            {
-                Main.player[Main.myPlayer].releaseMount = true;
-            }
             //Handle transitioning to phase 2
             if (NPC.CountNPCS(ModContent.NPCType<HypnosPlug>()) <= 0 && NPC.ai[0] > 1)
             {
@@ -777,7 +772,7 @@ namespace Hypnos.HypnosNPCs
             npcLoot.Add(ItemDropRule.ByCondition(DropHelper.If(() => Main.masterMode || revenge), ModContent.ItemType<DraedonRelic>()));
 
             // Lore item
-            npcLoot.Add(ItemDropRule.ByCondition(DropHelper.If(() => !HypnosWorld.downedHypnos), ModContent.ItemType<KnowledgeExoMechs>()));
+            npcLoot.Add(ItemDropRule.ByCondition(DropHelper.If(() => !HypnosWorld.downedHypnos), ModContent.ItemType<LoreExoMechs>()));
 
             // Treasure bag
             npcLoot.Add(ItemDropRule.BossBag(ModContent.ItemType<DraedonBag>()));
@@ -817,6 +812,15 @@ namespace Hypnos.HypnosNPCs
                     Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, Mod.Find<ModGore>("Hypnos4").Type, 1f);
                     Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, Mod.Find<ModGore>("Hypnos5").Type, 1f);
                 }
+            }
+        }
+
+        public override void HitEffect(int hitDirection, double damage)
+        {
+            if (NPC.soundDelay == 0)
+            {
+                NPC.soundDelay = 5;
+                SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.ExoHitSound, NPC.Center);
             }
         }
 

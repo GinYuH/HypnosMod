@@ -47,7 +47,7 @@ namespace Hypnos.HypnosNPCs
         public ThanatosSmokeParticleSet SmokeDrawer = new ThanatosSmokeParticleSet(-4, 3, 0f, 16f, 1.5f);
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("XP-00 Hypnos Aergia Neuron");
+            // DisplayName.SetDefault("XP-00 Hypnos Aergia Neuron");
             Main.npcFrameCount[NPC.type] = 1;
             NPCID.Sets.TrailingMode[NPC.type] = 1;
             this.HideFromBestiary();
@@ -189,7 +189,7 @@ namespace Hypnos.HypnosNPCs
                             Vector2 direction = targetPosition - position;
                             direction.Normalize();
                             Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, direction * -15 * lvf, laserproj, laserdamage, 0);
-                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound with { Volume = CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound.Volume - 0.1f }, NPC.Center);
+                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.ExoLaserShootSound with { Volume = CalamityMod.Sounds.CommonCalamitySounds.ExoLaserShootSound.Volume - 0.1f }, NPC.Center);
                             NPC.ai[2] = 0;
                         }
                     }
@@ -220,7 +220,7 @@ namespace Hypnos.HypnosNPCs
                         if (NPC.ai[2] >= lasertimer + Main.rand.Next(-5, 5))
                         {
                             Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, new Vector2(0, -11 * lvf), laserproj, laserdamage, 0);
-                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound with { Volume = CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound.Volume - 0.1f }, NPC.Center);
+                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.ExoLaserShootSound with { Volume = CalamityMod.Sounds.CommonCalamitySounds.ExoLaserShootSound.Volume - 0.1f }, NPC.Center);
                             NPC.ai[2] = 0;
                         }
                     }
@@ -269,7 +269,7 @@ namespace Hypnos.HypnosNPCs
                             Vector2 direction = targetPosition - position;
                             direction.Normalize();
 
-                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound with { Volume = CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound.Volume - 0.1f }, NPC.Center);
+                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.ExoLaserShootSound with { Volume = CalamityMod.Sounds.CommonCalamitySounds.ExoLaserShootSound.Volume - 0.1f }, NPC.Center);
                             Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, direction * -15 * lvf + playerspeed, laserproj, laserdamage, 0);
                             NPC.ai[2] = 0;
                         }
@@ -469,13 +469,13 @@ namespace Hypnos.HypnosNPCs
                                 case 1:
                                 case 2:
                                     NPC.ai[3] = 200;
-                                    lasertimer = hypnos.ModNPC<HypnosBoss>().ragetimer > 0 ? 70 : 110;
+                                    //lasertimer = hypnos.ModNPC<HypnosBoss>().ragetimer > 0 ? 70 : 110;
                                     break;
                                 case 3:
                                 case 4:
                                 case 5:
                                     NPC.ai[3] = 300;
-                                    lasertimer = hypnos.ModNPC<HypnosBoss>().ragetimer > 0 ? 55 : 70;
+                                    //lasertimer = hypnos.ModNPC<HypnosBoss>().ragetimer > 0 ? 55 : 70;
                                     break;
                                 case 6:
                                 case 7:
@@ -494,10 +494,10 @@ namespace Hypnos.HypnosNPCs
                         else
                         {
                             NPC.ai[3] = NPC.ai[1] < 6 ? 200 : 400;
-                            lasertimer = NPC.ai[1] < 6 ? 50 : 100;
+                            lasertimer = NPC.ai[1] < 6 ? 99999 : 40;
                             if (hypnos.ModNPC<HypnosBoss>().ragetimer > 0)
                             {
-                                lasertimer = NPC.ai[1] < 6 ? 25 : 50;
+                                lasertimer = NPC.ai[1] < 6 ? 99999 : 30;
                             }
                         }
                         if (hypnos.ai[1] < 60)
@@ -539,7 +539,7 @@ namespace Hypnos.HypnosNPCs
                             Vector2 direction = targetPosition - position;
                             direction.Normalize();
 
-                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound with { Volume = CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound.Volume - 0.1f }, NPC.Center);
+                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.ExoLaserShootSound with { Volume = CalamityMod.Sounds.CommonCalamitySounds.ExoLaserShootSound.Volume - 0.1f }, NPC.Center);
                             Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, direction * 15 * lvf, laserproj, laserdamage, 0);
                             NPC.ai[2] = 0;
                         }
@@ -636,7 +636,7 @@ namespace Hypnos.HypnosNPCs
                             {
                                 NPC.damage = 0;
                                 NPC.Calamity().canBreakPlayerDefense = false;
-                                Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound with { Volume = CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound.Volume - 0.2f, Pitch = CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound.Pitch + 0.2f }, NPC.Center);
+                                Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound with { Volume = CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound.Volume - 0.2f, Pitch = CalamityMod.Sounds.CommonCalamitySounds.ExoLaserShootSound.Pitch + 0.2f }, NPC.Center);
                                 NPC.ai[3]++;
                                 NPC.ai[2] = 0;
                                 Color ringcolor = hypnos.ModNPC<HypnosBoss>().ragetimer > 0 ? Color.Red * 1.2f : Color.Pink * 0.6f;
@@ -689,7 +689,7 @@ namespace Hypnos.HypnosNPCs
                                 {
                                     Vector2 velocity = new Vector2(0f, 8f * lvf);
                                     velocity = velocity.RotatedBy(variance * i);
-                                    Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound with { Volume = CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound.Volume - 0.2f, Pitch = CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound.Pitch + 0.2f }, NPC.Center);
+                                    Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.ExoLaserShootSound with { Volume = CalamityMod.Sounds.CommonCalamitySounds.ExoLaserShootSound.Volume - 0.2f, Pitch = CalamityMod.Sounds.CommonCalamitySounds.ExoLaserShootSound.Pitch + 0.2f }, NPC.Center);
                                     Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, velocity, laserproj, laserdamage, 0);
                                 }
                                 NPC.ai[2] = 0;
@@ -733,7 +733,7 @@ namespace Hypnos.HypnosNPCs
                         {                            
                             if (NPC.ai[1] == 0)
                             {
-                                Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.ELRFireSound with { Volume = CalamityMod.Sounds.CommonCalamitySounds.ELRFireSound.Volume, Pitch = CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound.Pitch - 0.2f });
+                                Terraria.Audio.SoundEngine.PlaySound(CalamityMod.NPCs.ExoMechs.Ares.AresGaussNuke.NukeExplosionSound with { Volume = CalamityMod.NPCs.ExoMechs.Ares.AresGaussNuke.NukeExplosionSound.Volume, Pitch = CalamityMod.Sounds.CommonCalamitySounds.ExoLaserShootSound.Pitch - 0.2f });
                                 for (int i = 0; i < 3; i++)
                                 {
                                     Projectile explosion = Main.projectile[Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<AresGaussNukeProjectileBoom>(), laserdamage * 2, 0)];
@@ -1231,7 +1231,7 @@ namespace Hypnos.HypnosNPCs
         public override void OnKill()
         {
         }
-        public override void HitEffect(int hitDirection, double damage)
+        public override void HitEffect(NPC.HitInfo hit)
         {
         }
 

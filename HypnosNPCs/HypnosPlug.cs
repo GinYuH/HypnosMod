@@ -14,7 +14,7 @@ namespace Hypnos.HypnosNPCs
         NPC hypnos;
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("XP-00 Hypnos Plug");
+            // DisplayName.SetDefault("XP-00 Hypnos Plug");
             Main.npcFrameCount[NPC.type] = 1;
             NPCID.Sets.TrailingMode[NPC.type] = 1;
             NPCID.Sets.MustAlwaysDraw[NPC.type] = true;
@@ -31,7 +31,7 @@ namespace Hypnos.HypnosNPCs
             double HPBoost = CalamityConfig.Instance.BossHealthBoost * 0.01;
             NPC.lifeMax += (int)(NPC.lifeMax * HPBoost);
             NPC.damage = 1;
-            NPC.HitSound = SoundID.NPCHit4;
+            NPC.HitSound = null;
             NPC.DeathSound = SoundID.Item14;
             NPC.knockBackResist = 0f;
             NPC.noTileCollide = true;
@@ -102,9 +102,9 @@ namespace Hypnos.HypnosNPCs
                 NPC.ai[2] = 1;
             }
         }
-        public override void ScaleExpertStats(int numPlayers, float bossLifeScale)
+        public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)
         {
-            NPC.lifeMax = (int)(NPC.lifeMax * 0.8f * bossLifeScale);
+            NPC.lifeMax = (int)(NPC.lifeMax * 0.8f * balance);
             NPC.damage = (int)(NPC.damage * NPC.GetExpertDamageMultiplier());
         }
 
@@ -120,6 +120,15 @@ namespace Hypnos.HypnosNPCs
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             initialized = reader.ReadBoolean();
+        }
+
+        public override void HitEffect(NPC.HitInfo hit)
+        {
+            if (NPC.soundDelay == 0)
+            {
+                NPC.soundDelay = 8;
+                Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.ExoHitSound, NPC.Center);
+            }
         }
     }
 }

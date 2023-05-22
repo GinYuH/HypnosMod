@@ -51,7 +51,7 @@ namespace Hypnos.HypnosNPCs
         public ThanatosSmokeParticleSet SmokeDrawer = new ThanatosSmokeParticleSet(-1, 3, 0f, 16f, 1.5f);
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("XP-00 Hypnos");
+            // DisplayName.SetDefault("XP-00 Hypnos");
             Main.npcFrameCount[NPC.type] = 4;
             NPCID.Sets.TrailingMode[NPC.type] = 1;
             NPCID.Sets.MustAlwaysDraw[NPC.type] = true;
@@ -317,7 +317,7 @@ namespace Hypnos.HypnosNPCs
                         }
                         if (NPC.ai[1] % chargetime == 0 && NPC.ai[1] >= chargestart && NPC.ai[1] < 340)
                         {
-                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.PlasmaBoltSound, NPC.Center);
+                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.NPCs.ExoMechs.Artemis.Artemis.ChargeSound, NPC.Center);
                             if (NPC.ai[1] % (chargetime * predictamt) == 0)
                             {
                                 Terraria.Audio.SoundEngine.PlaySound(SoundID.Roar, position);
@@ -417,7 +417,7 @@ namespace Hypnos.HypnosNPCs
                         else if (NPC.ai[2] % chargetime == 0 && NPC.ai[2] < setuptime + chargegate)
                         {
                             ring.Kill();
-                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.PlasmaBoltSound, NPC.Center);
+                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.NPCs.ExoMechs.Artemis.Artemis.ChargeSound, NPC.Center);
                             NPC.velocity = direction * chargespeed;
                             NPC.damage = hostdamage;
                             NPC.Calamity().canBreakPlayerDefense = true;
@@ -477,7 +477,7 @@ namespace Hypnos.HypnosNPCs
 
                         if (NPC.ai[1] == 0)
                         {
-                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.PlasmaBoltSound, NPC.Center);
+                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.NPCs.ExoMechs.Artemis.Artemis.ChargeSound, NPC.Center);
                         }
                         if (NPC.ai[1] < phasetime - 90)
                         {
@@ -494,7 +494,7 @@ namespace Hypnos.HypnosNPCs
                             Vector2 targetPosition = target.Center;
                             Vector2 direction = targetPosition - position;
                             direction.Normalize();
-                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.PlasmaBoltSound, NPC.Center);
+                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.NPCs.ExoMechs.Artemis.Artemis.ChargeSound, NPC.Center);
                             NPC.velocity = direction * 20;
                             NPC.damage = hostdamage;
                             NPC.Calamity().canBreakPlayerDefense = true;
@@ -532,7 +532,7 @@ namespace Hypnos.HypnosNPCs
                         NPC.Calamity().canBreakPlayerDefense = true;
                         if (NPC.ai[1] % chargetime == 0)
                         {
-                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.PlasmaBoltSound, NPC.Center);
+                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.NPCs.ExoMechs.Artemis.Artemis.ChargeSound, NPC.Center);
                             Vector2 pos = targetPosition + target.velocity * 20f - position;
                             NPC.velocity = Vector2.Normalize(pos) * chargespeed;
                             Color ringcolor = ragetimer > 0 ? Color.Red * 1.2f : Color.CornflowerBlue * 0.6f;
@@ -753,9 +753,9 @@ namespace Hypnos.HypnosNPCs
             SmokeDrawer.DrawSet(NPC.Center);
             return false;
         }
-        public override void ScaleExpertStats(int numPlayers, float bossLifeScale)
+        public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)
         {
-            NPC.lifeMax = (int)(NPC.lifeMax * 0.8f * bossLifeScale);
+            NPC.lifeMax = (int)(NPC.lifeMax * 0.8f * balance);
             NPC.damage = (int)(NPC.damage * NPC.GetExpertDamageMultiplier());
         }
 
@@ -815,7 +815,7 @@ namespace Hypnos.HypnosNPCs
             }
         }
 
-        public override void HitEffect(int hitDirection, double damage)
+        public override void HitEffect(NPC.HitInfo hit)
         {
             if (NPC.soundDelay == 0)
             {

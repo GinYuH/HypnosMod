@@ -1,6 +1,6 @@
 displayName = Hypnos in Calamity Mod
 author = YuH
-version = 1.0.2
+version = 1.0.3
 modReferences = CalamityMod
 hideCode = true
 hideResources = true

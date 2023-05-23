@@ -23,7 +23,7 @@ namespace Hypnos.HypnosNPCs
         NPC hypnos;
         public override void SetStaticDefaults()
         {
-            // DisplayName.SetDefault("Draedon");
+            DisplayName.SetDefault("Draedon");
             Main.npcFrameCount[NPC.type] = 12;
             this.HideFromBestiary();
         }

@@ -13,6 +13,11 @@ namespace Hypnos
 {
 	public class HypnosModClass : Mod
 	{
+        public static HypnosModClass instance;
+        public override void Load()
+        {
+            instance = this;
+}
 		public override void PostSetupContent()
 		{
 
@@ -54,5 +59,9 @@ namespace Hypnos
 				}
 			}
 		}
+        public override void Unload()
+        {
+            instance = null;
+}
 	}
 }

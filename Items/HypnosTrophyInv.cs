@@ -11,6 +11,7 @@ namespace Hypnos.Items
     {
         public override void SetStaticDefaults()
         {
+            DisplayName.SetDefault("Hypnos Trophy");
             Item.ResearchUnlockCount = 1;
         }
 

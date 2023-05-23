@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
 using CalamityMod;
 
-namespace Hypnos.HypnosNPCs
+namespace HypnosMod.HypnosNPCs
 {
     internal class HypnosPlug : ModNPC
     {

@@ -1,9 +1,9 @@
-﻿using Hypnos.HypnosNPCs;
+﻿using HypnosMod.HypnosNPCs;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace Hypnos.Projectiles
+namespace HypnosMod.Projectiles
 {
 	public class LargeTeslaSphere : ModProjectile
 	{

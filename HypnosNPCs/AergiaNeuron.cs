@@ -12,9 +12,9 @@ using CalamityMod;
 using CalamityMod.Particles;
 using CalamityMod.World;
 using CalamityMod.Projectiles.Boss;
-using Hypnos.Projectiles;
+using HypnosMod.Projectiles;
 
-namespace Hypnos.HypnosNPCs
+namespace HypnosMod.HypnosNPCs
 {
     internal class AergiaNeuron : ModNPC
     {

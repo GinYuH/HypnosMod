@@ -3,10 +3,10 @@ using Terraria.ID;
 using Microsoft.Xna.Framework;
 using System;
 using Terraria.ModLoader;
-using Hypnos.Projectiles;
+using HypnosMod.Projectiles;
 using CalamityMod;
 
-namespace Hypnos.Projectiles
+namespace HypnosMod.Projectiles
 {
 	public class RedExoPulseLaser : ModProjectile
 	{

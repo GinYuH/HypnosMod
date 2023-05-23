@@ -4,7 +4,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 
 //Courtesy of scalie
-namespace Hypnos
+namespace HypnosMod
 {
     internal class LocalizationRewriter : ModSystem
     {

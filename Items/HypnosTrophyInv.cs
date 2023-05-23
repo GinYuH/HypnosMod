@@ -5,7 +5,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.DataStructures;
 
-namespace Hypnos.Items
+namespace HypnosMod.Items
 {
     public class HypnosTrophyInv : ModItem
     {

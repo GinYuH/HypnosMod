@@ -8,7 +8,7 @@ using Terraria.GameContent.Shaders;
 using Terraria.Audio;
 using CalamityMod;
 
-namespace Hypnos.HypnosNPCs
+namespace HypnosMod.HypnosNPCs
 {
     internal class Draedon : ModNPC
     {

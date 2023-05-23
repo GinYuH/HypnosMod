@@ -5,7 +5,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.DataStructures;
 
-namespace Hypnos.Items
+namespace HypnosMod.Items
 {
     [AutoloadEquip(EquipType.Head)]
     public class HypnosMask : ModItem

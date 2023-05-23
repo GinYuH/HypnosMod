@@ -11,7 +11,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.WorldBuilding;
 
-namespace Hypnos
+namespace HypnosMod
 {
     public class HypnosWorld : ModSystem
     {

@@ -1,7 +1,7 @@
 ﻿using Terraria.ModLoader;
 using Terraria.ID;
 
-namespace Hypnos.Items
+namespace HypnosMod.Items
 {
 	public class HypnosMusicBox : ModItem
 	{

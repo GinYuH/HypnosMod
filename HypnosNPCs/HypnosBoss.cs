@@ -24,12 +24,12 @@ using CalamityMod.Items.Weapons.Melee;
 using CalamityMod.Items.Weapons.Ranged;
 using CalamityMod.Items.Weapons.Rogue;
 using CalamityMod.Items.Weapons.DraedonsArsenal;
-using Hypnos.Items;
-using Hypnos.Projectiles;
+using HypnosMod.Items;
+using HypnosMod.Projectiles;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.Audio;
 
-namespace Hypnos.HypnosNPCs
+namespace HypnosMod.HypnosNPCs
 {
     [AutoloadBossHead]
     internal class HypnosBoss : ModNPC

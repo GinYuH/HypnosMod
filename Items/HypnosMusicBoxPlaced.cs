@@ -5,7 +5,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
-namespace Hypnos.Items
+namespace HypnosMod.Items
 {
 	public class HypnosMusicBoxPlaced : ModTile
 	{

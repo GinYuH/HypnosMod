@@ -2,11 +2,11 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.DataStructures;
-using Hypnos.HypnosNPCs;
+using HypnosMod.HypnosNPCs;
 using CalamityMod.Items.Pets;
 using CalamityMod.Tiles.DraedonSummoner;
 
-namespace Hypnos
+namespace HypnosMod
 {
 	public class HypnosGlobalTile : GlobalTile
 	{

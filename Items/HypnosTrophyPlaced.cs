@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 using Terraria.ObjectData;
 using static Terraria.ModLoader.ModContent;
 
-namespace Hypnos.Items
+namespace HypnosMod.Items
 {
     public class HypnosTrophyPlaced : ModTile
     {

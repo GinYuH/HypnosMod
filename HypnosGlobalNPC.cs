@@ -2,7 +2,7 @@
 using Terraria;
 using Terraria.ModLoader;
 
-namespace Hypnos
+namespace HypnosMod
 {
     public class HypnosGlobalNPC : GlobalNPC
     {

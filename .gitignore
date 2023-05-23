@@ -1,2 +1,24 @@
 
 Hypnos.csproj
+*.v2
+*.v1
+*.dll
+*.pdb
+*.xml
+*.json
+.vs/HypnosMod/v17/.suo
+.vs/Hypnos/v17/.suo
+bin/Debug/net6.0/tModPorter.dll.config
+*.cache
+obj/Debug/net6.0/HypnosMod.AssemblyInfo.cs
+*.editorconfig
+*.CopyComplete
+obj/Debug/net6.0/Hypnos.AssemblyInfo.cs
+obj/Debug/net6.0/.NETCoreApp,Version=v6.0.AssemblyAttributes.cs
+*.targets
+*.props
+obj/Debug/net6.0/HypnosMod.csproj.FileListAbsolute.txt
+obj/Debug/net6.0/HypnosMod.csproj.BuildWithSkipAnalyzers
+obj/Debug/net6.0/Hypnos.csproj.FileListAbsolute.txt
+obj/Debug/net6.0/Hypnos.csproj.BuildWithSkipAnalyzers
+HypnosMod.csproj

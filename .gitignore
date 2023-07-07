@@ -1,5 +1,7 @@
-
+.vs/
 Hypnos.csproj
+HypnosMod-main.csproj
+Hypnos.sln
 *.v2
 *.v1
 *.dll

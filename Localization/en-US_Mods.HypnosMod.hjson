@@ -1,0 +1,34 @@
+Projectiles: {
+	RedExoPulseLaser.DisplayName: Red Exo Pulse Laser
+	LargeTeslaSphere.DisplayName: Large Tesla Sphere
+	BlueExoPulseLaser.DisplayName: Blue Exo Pulse Laser
+}
+
+Tiles: {
+	HypnosTrophyPlaced.MapEntry: Hypnos Trophy Placed
+	HypnosMusicBoxPlaced.MapEntry: Hypnos Music Box Placed
+}
+
+Items: {
+	HypnosTrophyInv: {
+		DisplayName: Hypnos Trophy
+		Tooltip: ""
+	}
+
+	HypnosMask: {
+		DisplayName: Hypnos Mask
+		Tooltip: ""
+	}
+
+	HypnosMusicBox: {
+		DisplayName: Hypnos Music Box
+		Tooltip: ""
+	}
+}
+
+NPCs: {
+	HypnosPlug.DisplayName: XP-00 Hypnos Plug
+	HypnosBoss.DisplayName: XP-00 Hypnos
+	Draedon.DisplayName: Draedon
+	AergiaNeuron.DisplayName: XP-00 Hypnos Aergia Neuron
+}

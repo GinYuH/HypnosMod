@@ -717,8 +717,8 @@ namespace HypnosMod.HypnosNPCs
                     spriteEffects = SpriteEffects.FlipHorizontally;
 
                 Texture2D texture = TextureAssets.Npc[NPC.type].Value;
-                Texture2D glowmask = Request<Texture2D>("Hypnos/HypnosNPCs/Hypnos_Glow").Value;
-                Texture2D eyetexture = Request<Texture2D>("Hypnos/HypnosNPCs/Hypnos_Eye").Value;
+                Texture2D glowmask = Request<Texture2D>("HypnosMod/HypnosNPCs/Hypnos_Glow").Value;
+                Texture2D eyetexture = Request<Texture2D>("HypnosMod/HypnosNPCs/Hypnos_Eye").Value;
                 Vector2 origin = new Vector2((float)(texture.Width / 2), (float)(texture.Height / Main.npcFrameCount[NPC.type] / 2));
                 Color white = Color.White;
                 float colorLerpAmt = 0.5f;

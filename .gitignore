@@ -24,3 +24,9 @@ obj/Debug/net6.0/HypnosMod.csproj.BuildWithSkipAnalyzers
 obj/Debug/net6.0/Hypnos.csproj.FileListAbsolute.txt
 obj/Debug/net6.0/Hypnos.csproj.BuildWithSkipAnalyzers
 HypnosMod.csproj
+HypnosMod.sln
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Ll]og/
+[Ll]ogs/

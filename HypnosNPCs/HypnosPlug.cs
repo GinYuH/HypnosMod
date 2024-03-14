@@ -43,66 +43,81 @@ namespace HypnosMod.HypnosNPCs
 
         public override void AI()
         {
-            if (!initialized)
-            {
-                hypnos = Main.npc[(int)NPC.ai[0]];
-            }
+			hypnos = Main.npc[(int)NPC.ai[0]];
+
+			int startneuron = 0;
+			int heighoffset = 20;
+			int heighoffsetin = 30;
+			int innerdist = 70;
+			int outerdist = 80;
+
+			Vector2 leftleftplug = new Vector2(hypnos.Center.X - outerdist, hypnos.Center.Y + heighoffset);
+			Vector2 leftplug = new Vector2(hypnos.Center.X - innerdist, hypnos.Center.Y + heighoffsetin);
+			Vector2 rightplug = new Vector2(hypnos.Center.X + innerdist, hypnos.Center.Y + heighoffsetin);
+			Vector2 rightrightplug = new Vector2(hypnos.Center.X + outerdist, hypnos.Center.Y + heighoffset);
+
+			Vector2 pluglocation = hypnos.Center;
+
+
+			switch (NPC.ai[1])
+			{
+				case 0:
+					pluglocation = leftleftplug;
+					startneuron = 0;
+					NPC.rotation = -(float)Math.PI / 2;
+					break;
+				case 1:
+					pluglocation = leftplug;
+					startneuron = 3;
+					NPC.rotation = -(float)Math.PI / 2;
+					break;
+				case 2:
+					pluglocation = rightplug;
+					NPC.rotation = (float)Math.PI / 2;
+					startneuron = 6;
+					break;
+				case 3:
+					pluglocation = rightrightplug;
+					NPC.rotation = (float)Math.PI / 2;
+					startneuron = 9;
+					break;
+			}
+			if (NPC.ai[2] == 0)
+			{
+				
+				for (int i = 0; i < 3; i++)
+				{
+					if (!(Main.getGoodWorld && i == 1))
+					{
+						//if (Main.netMode != NetmodeID.MultiplayerClient)
+							NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<AergiaNeuron>(), 0, (int)NPC.ai[0], startneuron + i, 0, NPC.whoAmI);
+					}
+				}
+				NPC.ai[2] = 1;
+			}
+			//if (!initialized)
+   //         {
+   //             hypnos = Main.npc[(int)NPC.ai[0]];
+   //         }
             if (!hypnos.active)
             {
                 NPC.active = false;
             }
             NPC.damage = 0;
 
-            int heighoffset = 20;
-            int heighoffsetin = 30;
-            int innerdist = 70;
-            int outerdist = 80;
-            Vector2 leftleftplug = new Vector2(hypnos.Center.X - outerdist, hypnos.Center.Y + heighoffset);
-            Vector2 leftplug = new Vector2(hypnos.Center.X - innerdist, hypnos.Center.Y + heighoffsetin);
-            Vector2 rightplug = new Vector2(hypnos.Center.X + innerdist, hypnos.Center.Y + heighoffsetin);
-            Vector2 rightrightplug = new Vector2(hypnos.Center.X + outerdist, hypnos.Center.Y + heighoffset);
-
-            Vector2 pluglocation = hypnos.Center;
-            int startneuron = 0;
-
-            switch (NPC.ai[1])
-            {
-                case 0:
-                    pluglocation = leftleftplug;
-                    startneuron = 0;
-                    NPC.rotation = -(float)Math.PI / 2;
-                    break;
-                case 1:
-                    pluglocation = leftplug;
-                    startneuron = 3;
-                    NPC.rotation = -(float)Math.PI / 2;
-                    break;
-                case 2:
-                    pluglocation = rightplug;
-                    NPC.rotation = (float)Math.PI / 2;
-                    startneuron = 6;
-                    break;
-                case 3:
-                    pluglocation = rightrightplug;
-                    NPC.rotation = (float)Math.PI / 2;
-                    startneuron = 9;
-                    break;
-            }
+            
+            
 
             NPC.position = pluglocation;
-            if (NPC.ai[2] == 0)
-            {
-                for (int i = 0; i < 3; i++)
-                {
-                    if (!(Main.getGoodWorld && i == 1))
-                    {
-                        NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<AergiaNeuron>(), 0, hypnos.whoAmI, startneuron + i, 0, NPC.whoAmI);
-                    }
-                }
-                NPC.ai[2] = 1;
-            }
+            
         }
-        public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)
+
+		public override void OnKill()
+		{
+			base.OnKill();
+		}
+
+		public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)
         {
             NPC.lifeMax = (int)(NPC.lifeMax * 0.8f * balance);
             NPC.damage = (int)(NPC.damage * NPC.GetExpertDamageMultiplier());

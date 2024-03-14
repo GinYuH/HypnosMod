@@ -11,10 +11,29 @@ using Terraria.ID;
 
 namespace HypnosMod
 {
+	enum HypnosMessageType
+	{
+		HypnosSummoned
+	}
+
 	public class HypnosMod : Mod
 	{
         public static HypnosMod instance;
-        public override void Load()
+
+		public override void HandlePacket(BinaryReader reader, int whoAmI)
+		{
+			HypnosMessageType msgType = (HypnosMessageType)reader.ReadByte();
+			switch (msgType)
+			{
+				case HypnosMessageType.HypnosSummoned:
+					int player = reader.ReadByte();
+					
+					HypnosBoss.SummonDraedon(Main.player[player]);
+					break;
+			}
+		}
+
+		public override void Load()
         {
             instance = this;
 }
@@ -22,7 +41,7 @@ namespace HypnosMod
 		{
 
 			Mod cal = ModLoader.GetMod("CalamityMod");
-			cal.Call("DeclareOneToManyRelationshipForHealthBar", ModContent.NPCType<HypnosBoss>(), ModContent.NPCType<HypnosPlug>());
+			//cal.Call("DeclareOneToManyRelationshipForHealthBar", ModContent.NPCType<HypnosBoss>(), ModContent.NPCType<HypnosPlug>());
 			List<(int, int, Action<int>, int, bool, float, int[], int[])> brEntries = (List<(int, int, Action<int>, int, bool, float, int[], int[])>)cal.Call("GetBossRushEntries");
 			int[] excIDs = { ModContent.NPCType<AergiaNeuron>(), ModContent.NPCType<HypnosPlug>() };
 			int[] headID = { ModContent.NPCType<HypnosBoss>() };

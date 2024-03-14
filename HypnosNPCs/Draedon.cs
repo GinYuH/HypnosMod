@@ -7,6 +7,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent.Shaders;
 using Terraria.Audio;
 using CalamityMod;
+using Terraria.Chat;
+using Terraria.Localization;
 
 namespace HypnosMod.HypnosNPCs
 {
@@ -21,6 +23,7 @@ namespace HypnosMod.HypnosNPCs
         public override string Texture => "CalamityMod/NPCs/ExoMechs/Draedon";
 
         NPC hypnos;
+        int hypnosWhoAmI;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Draedon");
@@ -42,9 +45,35 @@ namespace HypnosMod.HypnosNPCs
             NPC.width = NPC.height = 86;
         }
 
+        private void NewText(string text, Color textColor)
+        {
+            if (Main.netMode == NetmodeID.SinglePlayer)
+            {
+                Main.NewText(text, textColor);
+
+			}else if (Main.netMode == NetmodeID.Server)
+            {
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(text), textColor);
+            }
+        }
+
+        public int PlayerWhoAmI
+        {
+            get
+            {
+                return (int)NPC.ai[3];
+            }
+        }
+
         public override void AI()
         {
-            NPC.TargetClosest();
+			NPC.TargetClosest();
+
+			hypnos = Main.npc[hypnosWhoAmI];
+
+			Player player = Main.player[PlayerWhoAmI];
+
+			
             NPC.dontTakeDamage = true;
             int basetime = 120;
             int timemult = 130;
@@ -52,7 +81,7 @@ namespace HypnosMod.HypnosNPCs
             {
                 case 0:
                     {
-                        Vector2 playerpos = new Vector2(Main.player[NPC.target].Center.X - 100, Main.player[NPC.target].Center.Y - 200);
+                        Vector2 playerpos = new Vector2(player.Center.X - 100, player.Center.Y - 200);
                         Vector2 distanceFromDestination = playerpos - NPC.Center;
                         CalamityUtils.SmoothMovement(NPC, 100, distanceFromDestination, 30, 1, true);
 
@@ -62,30 +91,33 @@ namespace HypnosMod.HypnosNPCs
                         }
                         else if (NPC.ai[1] == basetime)
                         {
-                            Main.NewText("Most peculiar. Your alterations to the Codebreaker have led it to signal a foe I did not intend for you to encounter.", TextColor);
+                            NewText("Most peculiar. Your alterations to the Codebreaker have led it to signal a foe I did not intend for you to encounter.", TextColor);
                         }
                         else if (NPC.ai[1] == basetime + timemult)
                         {
-                            Main.NewText("Your previous battles have piqued my interest, and now your creativity has, too.", TextColor);
+                            NewText("Your previous battles have piqued my interest, and now your creativity has, too.", TextColor);
                         }
                         else if (NPC.ai[1] == basetime + timemult * 2)
                         {
-                            Main.NewText("You will face one of my older creations. Do not underestimate it.", TextColor);
+                            NewText("You will face one of my older creations. Do not underestimate it.", TextColor);
                         }
                         else if (NPC.ai[1] == basetime + timemult * 3)
                         {
-                            Main.NewText("Here we go.", TextColorEdgy);
+                            NewText("Here we go.", TextColorEdgy);
                             NPC.ai[2] = 1;
                         }
                         else if (NPC.ai[1] == basetime + timemult * 4)
                         {
+                            
                             if (Main.netMode != NetmodeID.Server)
                             {
                                 SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.FlareSound with { Volume = CalamityMod.Sounds.CommonCalamitySounds.FlareSound.Volume * 1.55f }, NPC.Center);
                             }
-                            int hypy = NPC.NewNPC(NPC.GetSource_FromAI(), (int)Main.LocalPlayer.Center.X, (int)(Main.LocalPlayer.Center.Y - 400), ModContent.NPCType<HypnosBoss>());
-                            hypnos = Main.npc[hypy];
-                            NPC.ai[1] = 0;
+                            int hypy = NPC.NewNPC(NPC.GetSource_FromAI(), (int)player.Center.X, (int)(player.Center.Y - 400), ModContent.NPCType<HypnosBoss>());
+                                hypnosWhoAmI = hypy;
+								hypnos = Main.npc[hypnosWhoAmI];
+                                hypnos.netUpdate = true;
+							NPC.ai[1] = 0;
                             NPC.ai[0] = 1;
                         }
                         NPC.ai[1]++;
@@ -102,11 +134,11 @@ namespace HypnosMod.HypnosNPCs
                         {
                             if (NPC.ai[1] == 20)
                             {
-                                Main.NewText("The tethers connecting its attendants to itself are inefficient at best.", TextColor);
+                                NewText("The tethers connecting its attendants to itself are inefficient at best.", TextColor);
                             }
                             else if (NPC.ai[1] == timemult)
                             {
-                                Main.NewText("A vestige of my inexperience. Do not let this pollute your judgment of my later creations.", TextColor);
+                                NewText("A vestige of my inexperience. Do not let this pollute your judgment of my later creations.", TextColor);
                                 NPC.ai[1] = 0;
                                 p2dial = true;
                             }
@@ -116,12 +148,12 @@ namespace HypnosMod.HypnosNPCs
                         {
                             if (NPC.ai[1] == 20)
                             {
-                                Main.NewText("Fascinating. Its amygdala appears to be administering adrenaline to its mechanical components.", TextColor);
+                                NewText("Fascinating. Its amygdala appears to be administering adrenaline to its mechanical components.", TextColor);
                             }
                             else if (NPC.ai[1] == timemult)
                             {
                                 SoundEngine.PlaySound(CalamityMod.NPCs.ExoMechs.Draedon.LaughSound, NPC.Center);
-                                Main.NewText("I did not account for this in my calculations. Your current situation appears dire indeed.", TextColor);
+                                NewText("I did not account for this in my calculations. Your current situation appears dire indeed.", TextColor);
                                 NPC.ai[1] = 0;
                                 revdial = true;
                             }
@@ -144,23 +176,23 @@ namespace HypnosMod.HypnosNPCs
                         NPC.ai[1]++;
                         if (NPC.ai[1] == basetime)
                         {
-                            Main.NewText("I cannot say I did not expect this to happen.", TextColor);
+                            NewText("I cannot say I did not expect this to happen.", TextColor);
                         }
                         else if (NPC.ai[1] == basetime + timemult)
                         {
-                            Main.NewText("Hypnos lacks synergy with my other creations. The free will of its organic components stifles its potential as an efficient war machine.", TextColor);
+                            NewText("Hypnos lacks synergy with my other creations. The free will of its organic components stifles its potential as an efficient war machine.", TextColor);
                         }
                         else if (NPC.ai[1] == basetime + timemult * 2)
                         {
-                            Main.NewText("I have ascertained everything necessary about this creation and its capabilities.", TextColor);
+                            NewText("I have ascertained everything necessary about this creation and its capabilities.", TextColor);
                         }
                         else if (NPC.ai[1] == basetime + timemult * 3)
                         {
-                            Main.NewText("Salvage what you wish from it. You will need it more than I for what is to come.", TextColor);
+                            NewText("Salvage what you wish from it. You will need it more than I for what is to come.", TextColor);
                         }
                         else if (NPC.ai[1] == basetime + timemult * 4)
                         {
-                            Main.NewText("And please. Dislodge that blood clot from my device the next time you use it.", TextColor);
+                            NewText("And please. Dislodge that blood clot from my device the next time you use it.", TextColor);
                         }
                         else if (NPC.ai[1] >= basetime + timemult * 5)
                         {
@@ -181,6 +213,8 @@ namespace HypnosMod.HypnosNPCs
         }
         public override void SendExtraAI(BinaryWriter writer)
         {
+            writer.Write((byte)hypnosWhoAmI);
+
             writer.Write(p2dial);
             writer.Write(revdial);
             writer.Write(initialized);
@@ -188,6 +222,8 @@ namespace HypnosMod.HypnosNPCs
 
         public override void ReceiveExtraAI(BinaryReader reader)
         {
+            hypnosWhoAmI = reader.ReadByte();
+
             p2dial = reader.ReadBoolean();
             revdial = reader.ReadBoolean();
             initialized = reader.ReadBoolean();

@@ -85,14 +85,22 @@ namespace HypnosMod.HypnosNPCs
             {
                 laserdamage = p2 ? 205 : 160;
             }
+
+			
+
             if (!initialized)
             {
-                hypnos = Main.npc[(int)NPC.ai[0]];
-                plug = Main.npc[(int)NPC.ai[3]];
-                initialized = true;
+				hypnos = Main.npc[(int)NPC.ai[0]];
+				plug = Main.npc[(int)NPC.ai[3]];
+				initialized = true;
+                NPC.netUpdate = true;
+                return;
             }
-            //I'm keeping NPC.ai[0] consistent with Hypnos to reduce confusion
-            NPC.ai[0] = hypnos.ai[0];
+
+			//hypnos = Main.npc[HypnosGlobalNPC.hypnos];
+			//I'm keeping NPC.ai[0] consistent with Hypnos to reduce confusion
+
+			//NPC.ai[0] = hypnos.ai[0];
             enraged = hypnos.ModNPC<HypnosBoss>().enraged;
             Player target = Main.player[hypnos.target];
             if (!plug.active && plug.type == ModContent.NPCType<HypnosPlug>())
@@ -115,20 +123,26 @@ namespace HypnosMod.HypnosNPCs
             {
                 lvf = 1.1f;
             }
-            SmokeDrawer.ParticleSpawnRate = 9999999;
-            if (ring != null)
+            
+            if (Main.netMode != NetmodeID.Server)
             {
-                ring.Scale *= 1.1f;
-                ring.Time += 1;
-            }
-            if (hypnos.ModNPC<HypnosBoss>().ragetimer > 0 && hypnos.ai[0] != 8)
-            {
-                SmokeDrawer.ParticleSpawnRate = 12;
-                SmokeDrawer.BaseMoveRotation = NPC.rotation + MathHelper.PiOver2;
-                SmokeDrawer.SpawnAreaCompactness = 1f;
-            }
-            SmokeDrawer.Update();
-            switch (NPC.ai[0])
+				SmokeDrawer.ParticleSpawnRate = 9999999;
+				if (ring != null)
+				{
+					ring.Scale *= 1.1f;
+					ring.Time += 1;
+				}
+				if (hypnos.ModNPC<HypnosBoss>().ragetimer > 0 && hypnos.ai[0] != 8)
+				{
+					SmokeDrawer.ParticleSpawnRate = 12;
+					SmokeDrawer.BaseMoveRotation = NPC.rotation + MathHelper.PiOver2;
+					SmokeDrawer.SpawnAreaCompactness = 1f;
+				}
+				SmokeDrawer.Update();
+			}
+            
+            
+            switch (hypnos.ai[0])
             {
                 case 0: //Basic idle
                 case 1:
@@ -639,9 +653,13 @@ namespace HypnosMod.HypnosNPCs
                                 Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound with { Volume = CalamityMod.Sounds.CommonCalamitySounds.LaserCannonSound.Volume - 0.2f, Pitch = CalamityMod.Sounds.CommonCalamitySounds.ExoLaserShootSound.Pitch + 0.2f }, NPC.Center);
                                 NPC.ai[3]++;
                                 NPC.ai[2] = 0;
-                                Color ringcolor = hypnos.ModNPC<HypnosBoss>().ragetimer > 0 ? Color.Red * 1.2f : Color.Pink * 0.6f;
-                                ring = new BloomRing(NPC.Center, Vector2.Zero, ringcolor, NPC.scale * 0.4f, 30);
-                                GeneralParticleHandler.SpawnParticle(ring);
+                                if (Main.netMode != NetmodeID.Server)
+                                {
+									Color ringcolor = hypnos.ModNPC<HypnosBoss>().ragetimer > 0 ? Color.Red * 1.2f : Color.Pink * 0.6f;
+									ring = new BloomRing(NPC.Center, Vector2.Zero, ringcolor, NPC.scale * 0.4f, 30);
+									GeneralParticleHandler.SpawnParticle(ring);
+								}
+                                
                                 NPC.position = new Vector2(idealx, idealy);
                             }
                         }
@@ -758,7 +776,7 @@ namespace HypnosMod.HypnosNPCs
                     break;
             }
             //This is copypasted Corite AI
-            if (NPC.ai[0] == 10 && p2)
+            if (hypnos.ai[0] == 10 && p2)
             {
                 NPC.damage = 240;
                 NPC.Calamity().canBreakPlayerDefense = true;
@@ -924,19 +942,19 @@ namespace HypnosMod.HypnosNPCs
 
         }
 
-        public void ChangePhase(int phasenum, bool reset1 = true, bool reset2 = true, bool reset4 = true)
-        {
-            NPC.ai[0] = phasenum;
-            if (reset2)
-            {
-                NPC.ai[2] = 0;
-            }
-            if (reset4)
-            {
-                NPC.Calamity().newAI[4] = 0;
-            }
-            afterimages = false;
-        }
+        //public void ChangePhase(int phasenum, bool reset1 = true, bool reset2 = true, bool reset4 = true)
+        //{
+        //    hypnos.ai[0] = phasenum;
+        //    if (reset2)
+        //    {
+        //        NPC.ai[2] = 0;
+        //    }
+        //    if (reset4)
+        //    {
+        //        NPC.Calamity().newAI[4] = 0;
+        //    }
+        //    afterimages = false;
+        //}
 
         public override void FindFrame(int frameHeight)
         {
@@ -996,7 +1014,7 @@ namespace HypnosMod.HypnosNPCs
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             SmokeDrawer.DrawSet(NPC.Center);
-            if (!(NPC.ai[0] == 11 && hypnos.ai[1] >= 31))
+            if (!(hypnos.ai[0] == 11 && hypnos.ai[1] >= 31))
             {
                 DrawHypnos(spriteBatch, screenPos, drawColor);
             }
@@ -1010,6 +1028,7 @@ namespace HypnosMod.HypnosNPCs
 
         public void dolightning()
         {
+             
             if (LightningDrawer is null)
                 LightningDrawer = new PrimitiveTrail(WidthFunction, ColorFunction, PrimitiveTrail.RigidPointRetreivalFunction);
             if (LightningBackgroundDrawer is null)
@@ -1054,7 +1073,7 @@ namespace HypnosMod.HypnosNPCs
                     }
                 }
             }
-            if ((NPC.ai[2] > (60 * NPC.ai[1]) + 10) && NPC.ai[0] == 5 && !p2)
+            if ((NPC.ai[2] > (60 * NPC.ai[1]) + 10) && hypnos.ai[0] == 5 && !p2)
             {
                 List<Vector2> points = AresTeslaOrb.DetermineElectricArcPoints(plug.Center, NPC.Center, 250290787);
                 LightningBackgroundDrawer.Draw(points, -Main.screenPosition, 290);
@@ -1070,6 +1089,7 @@ namespace HypnosMod.HypnosNPCs
 
         public void doafterimages(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+             
             SpriteEffects spriteEffects = SpriteEffects.None;
             if (NPC.spriteDirection == 1)
                 spriteEffects = SpriteEffects.FlipHorizontally;
@@ -1114,6 +1134,7 @@ namespace HypnosMod.HypnosNPCs
 
         public void drawchain(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+             
             int heighoffset = 20;
             int heighoffsetin = 30;
             int innerdist = 70;
@@ -1160,13 +1181,17 @@ namespace HypnosMod.HypnosNPCs
             Texture2D texture = Request<Texture2D>("HypnosMod/HypnosNPCs/HypnosPlugCable").Value; //change this accordingly to your chain texture
 
             Color chaincolor = drawColor;
-            if ((NPC.ai[2] > (60 * NPC.ai[1]) + 10) && NPC.ai[0] == 5)
+            if ((NPC.ai[2] > (60 * NPC.ai[1]) + 10) && hypnos.ai[0] == 5)
             {
                 doIDraw = false;
             }
             while (doIDraw)
             {
                 float distance = (pluglocation - distToProj).Length();
+                if (distance > 10000f)
+                {
+                    break;
+                }
                 if (distance < (texture.Height + 1))
                 {
                     doIDraw = false;
@@ -1183,6 +1208,7 @@ namespace HypnosMod.HypnosNPCs
 
         public void DrawHypnos(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+             
             if (NPC.ai[1] == 11)
             {
                 SpriteEffects spriteEffects = SpriteEffects.None;
@@ -1241,9 +1267,11 @@ namespace HypnosMod.HypnosNPCs
         }
         public override void SendExtraAI(BinaryWriter writer)
         {
+            //writer.Write(hypnos);
+
             writer.Write(hypnosafter);
             writer.Write(afterimages);
-            writer.Write(initialized);
+            //writer.Write(initialized);
             writer.Write(p2);
             writer.Write(enraged);
 
@@ -1260,9 +1288,12 @@ namespace HypnosMod.HypnosNPCs
 
         public override void ReceiveExtraAI(BinaryReader reader)
         {
-            afterimages = reader.ReadBoolean();
-            hypnosafter = reader.ReadBoolean();
-            initialized = reader.ReadBoolean();
+            //hypnos = reader.ReadByte(hypnos);
+
+			hypnosafter = reader.ReadBoolean();
+			afterimages = reader.ReadBoolean();
+            
+            //initialized = reader.ReadBoolean();
             p2 = reader.ReadBoolean();
             enraged = reader.ReadBoolean();
 

@@ -32,3 +32,5 @@ NPCs: {
 	Draedon.DisplayName: Draedon
 	AergiaNeuron.DisplayName: XP-00 Hypnos Aergia Neuron
 }
+
+Emotes.HypnosEmote.Command: hypnos

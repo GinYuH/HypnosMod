@@ -10,12 +10,25 @@ namespace HypnosMod
 {
 	public class HypnosGlobalTile : GlobalTile
 	{
+
 		public override void RightClick(int i, int j, int type)
         {
 			if (type == ModContent.TileType<CodebreakerTile>() && Main.LocalPlayer.HeldItem.type == ModContent.ItemType<BloodyVein>() && NPC.CountNPCS(ModContent.NPCType<Draedon>()) <= 0)
             {
-				NPC.NewNPC(new Terraria.DataStructures.EntitySource_TileBreak(i, j), (int)Main.LocalPlayer.Center.X, (int)(Main.LocalPlayer.Center.Y - 1200), ModContent.NPCType<Draedon>());
-                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.UI.DraedonSummoning.CodebreakerUI.BloodSound, Main.LocalPlayer.Center);
+				Terraria.Audio.SoundEngine.PlaySound(CalamityMod.UI.DraedonSummoning.CodebreakerUI.BloodSound, Main.LocalPlayer.Center);
+
+				if (Main.netMode == NetmodeID.MultiplayerClient)
+				{
+					ModPacket packet = Mod.GetPacket();
+					packet.Write((byte)HypnosMessageType.HypnosSummoned);
+					packet.Write((byte)Main.myPlayer);
+					packet.Send();
+				}
+				else
+				{
+					HypnosBoss.SummonDraedon(Main.LocalPlayer);
+				}
+				
             }
         }
 	}

@@ -34,7 +34,7 @@ namespace HypnosMod.HypnosNPCs
     [AutoloadBossHead]
     internal class HypnosBoss : ModNPC
     {
-        public bool initialized = false;
+        public bool initializedLocal = false;
         public bool afterimages = false;
         public bool p2 = false;
         public bool beserk = false;
@@ -88,7 +88,7 @@ namespace HypnosMod.HypnosNPCs
         public override void AI()
         {
             // Lol
-            Main.player[Main.myPlayer].ZoneTowerVortex = true;
+            //Main.player[Main.myPlayer].ZoneTowerVortex = true;
             if (Main.getGoodWorld)
             {
                 NPC.scale = 1.75f;
@@ -101,6 +101,7 @@ namespace HypnosMod.HypnosNPCs
             {
                 NPC.dontTakeDamage = false;
                 p2 = true;
+                NPC.netUpdate = true;
             }
             else if (NPC.ai[0] != 11)
             {
@@ -116,41 +117,50 @@ namespace HypnosMod.HypnosNPCs
             }
             SmokeDrawer.Update();
             //Pulse fx
-            if (NPC.ai[0] == 1 && NPC.ai[1] == 0)
+            if (Main.netMode != NetmodeID.Server)
             {
-                aura = new StrongBloom(NPC.Center, Vector2.Zero, Color.HotPink * 1.1f, NPC.scale * (1f + Main.rand.NextFloat(0f, 1.5f)) * 1.5f, 40);
-                ring = new BloomRing(NPC.Center, Vector2.Zero, Color.Purple * 1.2f, NPC.scale * 1.5f, 40);
-                GeneralParticleHandler.SpawnParticle(aura);
-                GeneralParticleHandler.SpawnParticle(ring);
-            }
-            if (ring != null)
-            {
-                ring.Position = NPC.Center;
-                ring.Velocity = NPC.velocity;
-                ring.Time = 0;
-            }
-            if (aura != null)
-            {
-                aura.Position = NPC.Center;
-                aura.Velocity = NPC.velocity;
-                aura.Time = 0;
-            }
-            if (p2)
-            {
-                ring.Scale *= 1.1f;
-                ring.Time += 1;
-                if (aura != null)
-                {
-                    aura.Kill();
-                }
-            }
-            if (ring2 != null)
-            {
-                ring2.Position = NPC.Center;
-                ring2.Velocity = NPC.velocity;
-                ring2.Scale *= 1.1f;
-                ring2.Time += 1;
-            }
+				if (NPC.ai[0] == 1 && !initializedLocal)
+				{
+					aura = new StrongBloom(NPC.Center, Vector2.Zero, Color.HotPink * 1.1f, NPC.scale * (1f + Main.rand.NextFloat(0f, 1.5f)) * 1.5f, 40);
+					ring = new BloomRing(NPC.Center, Vector2.Zero, Color.Purple * 1.2f, NPC.scale * 1.5f, 40);
+					GeneralParticleHandler.SpawnParticle(aura);
+					GeneralParticleHandler.SpawnParticle(ring);
+					initializedLocal = true;
+				}
+				if (ring != null)
+				{
+					ring.Position = NPC.Center;
+					ring.Velocity = NPC.velocity;
+					ring.Time = 0;
+				}
+				if (aura != null)
+				{
+					aura.Position = NPC.Center;
+					aura.Velocity = NPC.velocity;
+					aura.Time = 0;
+				}
+				if (p2)
+				{
+					if (ring != null)
+					{
+						ring.Scale *= 1.1f;
+						ring.Time += 1;
+					}
+
+					if (aura != null)
+					{
+						aura?.Kill();
+					}
+				}
+				if (ring2 != null)
+				{
+					ring2.Position = NPC.Center;
+					ring2.Velocity = NPC.velocity;
+					ring2.Scale *= 1.1f;
+					ring2.Time += 1;
+				}
+			}
+            
             hostdamage = Main.expertMode ? 400 : 600;
             HypnosGlobalNPC.hypnos = NPC.whoAmI;
             if ((NPC.life <= NPC.lifeMax * 0.25f && !beserk && revenge) || (NPC.life <= NPC.lifeMax * 0.75f && !beserk && death))
@@ -180,30 +190,35 @@ namespace HypnosMod.HypnosNPCs
                         {
                             if (Main.rand.NextBool(2))
                             {
-                                int num5 = Dust.NewDust(NPC.position, NPC.width, NPC.height, 226, 0f, 0f, 200, default, 1.5f);
-                                Main.dust[num5].noGravity = true;
-                                Main.dust[num5].velocity *= 0.75f;
-                                Main.dust[num5].fadeIn = 1.3f;
-                                Vector2 vector = new Vector2((float)Main.rand.Next(-400, 401), (float)Main.rand.Next(-400, 401));
-                                vector.Normalize();
-                                vector *= (float)Main.rand.Next(100, 200) * 0.04f;
-                                Main.dust[num5].velocity = vector;
-                                vector.Normalize();
-                                vector *= 34f;
-                                Main.dust[num5].position = NPC.Center - vector;
+                                if (!Main.dedServ)
+                                {
+									int num5 = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Electric, 0f, 0f, 200, default, 1.5f);
+									Main.dust[num5].noGravity = true;
+									Main.dust[num5].velocity *= 0.75f;
+									Main.dust[num5].fadeIn = 1.3f;
+									Vector2 vector = new Vector2((float)Main.rand.Next(-400, 401), (float)Main.rand.Next(-400, 401));
+									vector.Normalize();
+									vector *= (float)Main.rand.Next(100, 200) * 0.04f;
+									Main.dust[num5].velocity = vector;
+									vector.Normalize();
+									vector *= 34f;
+									Main.dust[num5].position = NPC.Center - vector;
+								}
+                               
                             }
                         }
                         else
                         {
                             for (int i = 0; i < 4; i++)
                             {
-                                NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<HypnosPlug>(), 0, NPC.whoAmI, i);
+                                //if (Main.netMode != NetmodeID.MultiplayerClient)
+                                NPC.NewNPCDirect(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<HypnosPlug>(), 0, NPC.whoAmI, i);
                             }
                             for (int l = 0; l < 48; l++)
                             {
                                 Vector2 vector3 = Vector2.UnitX * (float)-(float)NPC.width / 2f;
                                 vector3 += -Vector2.UnitY.RotatedBy((double)((float)l * 3.14159274f / 6f), default) * new Vector2(8f, 16f);
-                                int num9 = Dust.NewDust(NPC.Center, 0, 0, 221, 0f, 0f, 160, default, 1f);
+                                int num9 = Dust.NewDust(NPC.Center, 0, 0, DustID.FireworkFountain_Blue, 0f, 0f, 160, default, 1f);
                                 Main.dust[num9].scale = 1.1f;
                                 Main.dust[num9].noGravity = true;
                                 Main.dust[num9].position = NPC.Center + vector3;
@@ -323,8 +338,12 @@ namespace HypnosMod.HypnosNPCs
                                 Terraria.Audio.SoundEngine.PlaySound(SoundID.Roar, position);
                                 Vector2 pos = targetPosition + target.velocity * 20f - position;
                                 NPC.velocity = Vector2.Normalize(pos) * chargespeed;
-                                ring2 = new BloomRing(NPC.Center, Vector2.Zero, Color.Purple * 1.2f, NPC.scale * 1.5f, 40);
-                                GeneralParticleHandler.SpawnParticle(ring2);
+                                if (Main.netMode != NetmodeID.Server)
+                                {
+									ring2 = new BloomRing(NPC.Center, Vector2.Zero, Color.Purple * 1.2f, NPC.scale * 1.5f, 40);
+									GeneralParticleHandler.SpawnParticle(ring2);
+								}
+                                
                             } 
                             else
                             {
@@ -416,7 +435,10 @@ namespace HypnosMod.HypnosNPCs
                         }
                         else if (NPC.ai[2] % chargetime == 0 && NPC.ai[2] < setuptime + chargegate)
                         {
-                            ring.Kill();
+                            if (Main.netMode != NetmodeID.Server)
+                            {
+                                ring?.Kill();
+                            }
                             Terraria.Audio.SoundEngine.PlaySound(CalamityMod.NPCs.ExoMechs.Artemis.Artemis.ChargeSound, NPC.Center);
                             NPC.velocity = direction * chargespeed;
                             NPC.damage = hostdamage;
@@ -465,6 +487,7 @@ namespace HypnosMod.HypnosNPCs
                         if (NPC.ai[1] == 1)
                         {
                             NPC.ai[3] = Main.rand.Next(1, 361);
+                            NPC.netUpdate = true;
                         }
                         float rotspeed = NPC.ai[2] * 0.01f;
                         double deg = NPC.ai[3] + NPC.ai[2] * MathHelper.Clamp(rotspeed, NPC.ai[2] * 0.01f, 4);
@@ -535,9 +558,12 @@ namespace HypnosMod.HypnosNPCs
                             Terraria.Audio.SoundEngine.PlaySound(CalamityMod.NPCs.ExoMechs.Artemis.Artemis.ChargeSound, NPC.Center);
                             Vector2 pos = targetPosition + target.velocity * 20f - position;
                             NPC.velocity = Vector2.Normalize(pos) * chargespeed;
-                            Color ringcolor = ragetimer > 0 ? Color.Red * 1.2f : Color.CornflowerBlue * 0.6f;
-                            ring2 = new BloomRing(NPC.Center, Vector2.Zero, ringcolor, NPC.scale * 1.5f, 40);
-                            GeneralParticleHandler.SpawnParticle(ring2);
+                            if (Main.netMode != NetmodeID.Server)
+                            {
+                                Color ringcolor = ragetimer > 0 ? Color.Red * 1.2f : Color.CornflowerBlue * 0.6f;
+                                ring2 = new BloomRing(NPC.Center, Vector2.Zero, ringcolor, NPC.scale * 1.5f, 40);
+                                GeneralParticleHandler.SpawnParticle(ring2);
+                            }
                             afterimages = true;
                         }
                         if (NPC.ai[1] < (chargetime - 1))
@@ -630,8 +656,11 @@ namespace HypnosMod.HypnosNPCs
                         }
                         if (NPC.ai[1] == 31)
                         {
-                            ring2 = new BloomRing(NPC.Center, Vector2.Zero, Color.Purple * 1.2f, NPC.scale * 1.5f, 40);
-                            GeneralParticleHandler.SpawnParticle(ring2);
+                            if (Main.netMode != NetmodeID.Server)
+                            {
+                                ring2 = new BloomRing(NPC.Center, Vector2.Zero, Color.Purple * 1.2f, NPC.scale * 1.5f, 40);
+                                GeneralParticleHandler.SpawnParticle(ring2);
+                            }
                         }
                         if (NPC.ai[3] == attackamt)
                         {
@@ -797,10 +826,13 @@ namespace HypnosMod.HypnosNPCs
         public override void OnKill()
         {
             HypnosWorld.downedHypnos = true;
-            if (aura != null)
-                aura.Kill();
-            if (ring != null)
-                ring.Kill();
+            if (Main.netMode != NetmodeID.Server)
+            {
+                if (aura != null)
+                    aura.Kill();
+                if (ring != null)
+                    ring.Kill();
+            }
 
             if (NPC.life <= 0)
             {
@@ -831,7 +863,7 @@ namespace HypnosMod.HypnosNPCs
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.Write(afterimages);
-            writer.Write(initialized);
+            //writer.Write(initializedLocal);
             writer.Write(p2);
             writer.Write(enraged);
             writer.Write(beserk);
@@ -843,14 +875,22 @@ namespace HypnosMod.HypnosNPCs
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             afterimages = reader.ReadBoolean();
-            beserk = reader.ReadBoolean();
-            initialized = reader.ReadBoolean();
-            p2 = reader.ReadBoolean();
-            enraged = reader.ReadBoolean();
+			//initializedLocal = reader.ReadBoolean();
+			p2 = reader.ReadBoolean();
 
-            ragetimer = reader.ReadInt32();
-            hostdamage = reader.ReadInt32();
+			enraged = reader.ReadBoolean();
+			beserk = reader.ReadBoolean();
+
+			hostdamage = reader.ReadInt32();
+			ragetimer = reader.ReadInt32();
+            
             beserktimer = reader.ReadInt32();
         }
-    }
+
+        public static void SummonDraedon(Player player)
+        { // don't call it on multiplayer client
+			NPC.NewNPC(new Terraria.DataStructures.EntitySource_BossSpawn(player), (int)player.Center.X, (int)(player.Center.Y - 1200), NPCType<Draedon>(), 0, 0, 0, 0, player.whoAmI, player.whoAmI);
+
+		}
+	}
 }

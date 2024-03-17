@@ -13,6 +13,7 @@ using CalamityMod.Particles;
 using CalamityMod.World;
 using CalamityMod.Projectiles.Boss;
 using HypnosMod.Projectiles;
+using CalamityMod.Graphics.Primitives;
 
 namespace HypnosMod.HypnosNPCs
 {
@@ -40,9 +41,6 @@ namespace HypnosMod.HypnosNPCs
         NPC plug;
 
         public Particle ring;
-
-        public PrimitiveTrail LightningDrawer;
-        public PrimitiveTrail LightningBackgroundDrawer;
 
         public ThanatosSmokeParticleSet SmokeDrawer = new ThanatosSmokeParticleSet(-4, 3, 0f, 16f, 1.5f);
         public override void SetStaticDefaults()
@@ -1027,13 +1025,7 @@ namespace HypnosMod.HypnosNPCs
         }
 
         public void dolightning()
-        {
-             
-            if (LightningDrawer is null)
-                LightningDrawer = new PrimitiveTrail(WidthFunction, ColorFunction, PrimitiveTrail.RigidPointRetreivalFunction);
-            if (LightningBackgroundDrawer is null)
-                LightningBackgroundDrawer = new PrimitiveTrail(BackgroundWidthFunction, BackgroundColorFunction, PrimitiveTrail.RigidPointRetreivalFunction);
-
+        {            
             for (int i = 0; i < Main.maxNPCs; i++)
             {
                 NPC nextneuron = Main.npc[i];
@@ -1044,15 +1036,16 @@ namespace HypnosMod.HypnosNPCs
                         if (nextneuron.ai[1] == NPC.ai[1] + 1 && !(NPC.ai[1] == 3 && nextneuron.ai[1] == 4))
                         {
                             List<Vector2> points = AresTeslaOrb.DetermineElectricArcPoints(NPC.Center, nextneuron.Center, 250290787);
-                            LightningBackgroundDrawer.Draw(points, -Main.screenPosition, 290);
-                            LightningDrawer.Draw(points, -Main.screenPosition, 290);
+                            PrimitiveRenderer.RenderTrail(points, new(BackgroundWidthFunction, BackgroundColorFunction, smoothen: false), 90);
+                            PrimitiveRenderer.RenderTrail(points, new(WidthFunction, ColorFunction, smoothen: false), 90);
+
                         }
 
                         if (NPC.ai[1] == 3 && nextneuron.ai[1] == 0)
                         {
                             List<Vector2> points = AresTeslaOrb.DetermineElectricArcPoints(NPC.Center, nextneuron.Center, 250290787);
-                            LightningBackgroundDrawer.Draw(points, -Main.screenPosition, 290);
-                            LightningDrawer.Draw(points, -Main.screenPosition, 290);
+                            PrimitiveRenderer.RenderTrail(points, new(BackgroundWidthFunction, BackgroundColorFunction, smoothen: false), 90);
+                            PrimitiveRenderer.RenderTrail(points, new(WidthFunction, ColorFunction, smoothen: false), 90);
 
                         }
                     }
@@ -1061,14 +1054,14 @@ namespace HypnosMod.HypnosNPCs
                         if ((nextneuron.ai[1] == NPC.ai[1] + 1 && NPC.ai[1] < 11) || (NPC.ai[1] == 11 && nextneuron.ai[1] == 0))
                         {
                             List<Vector2> points = AresTeslaOrb.DetermineElectricArcPoints(NPC.Center, nextneuron.Center, 250290787);
-                            LightningBackgroundDrawer.Draw(points, -Main.screenPosition, 290);
-                            LightningDrawer.Draw(points, -Main.screenPosition, 290);
+                            PrimitiveRenderer.RenderTrail(points, new(BackgroundWidthFunction, BackgroundColorFunction, smoothen: false), 90);
+                            PrimitiveRenderer.RenderTrail(points, new(WidthFunction, ColorFunction, smoothen: false), 90);
                         }
                         if (NPC.ai[1] == 11 && nextneuron.ai[1] == 0)
                         {
                             List<Vector2> points = AresTeslaOrb.DetermineElectricArcPoints(NPC.Center, nextneuron.Center, 250290787);
-                            LightningBackgroundDrawer.Draw(points, -Main.screenPosition, 290);
-                            LightningDrawer.Draw(points, -Main.screenPosition, 290);
+                            PrimitiveRenderer.RenderTrail(points, new(BackgroundWidthFunction, BackgroundColorFunction, smoothen: false), 90);
+                            PrimitiveRenderer.RenderTrail(points, new(WidthFunction, ColorFunction, smoothen: false), 90);
                         }
                     }
                 }
@@ -1076,14 +1069,14 @@ namespace HypnosMod.HypnosNPCs
             if ((NPC.ai[2] > (60 * NPC.ai[1]) + 10) && hypnos.ai[0] == 5 && !p2)
             {
                 List<Vector2> points = AresTeslaOrb.DetermineElectricArcPoints(plug.Center, NPC.Center, 250290787);
-                LightningBackgroundDrawer.Draw(points, -Main.screenPosition, 290);
-                LightningDrawer.Draw(points, -Main.screenPosition, 290);
+                PrimitiveRenderer.RenderTrail(points, new(BackgroundWidthFunction, BackgroundColorFunction, smoothen: false), 90);
+                PrimitiveRenderer.RenderTrail(points, new(WidthFunction, ColorFunction, smoothen: false), 90);
             }
             if (hypnos.ai[0] == 10 && NPC.ai[2] > 0 && !(NPC.ai[1] <= 10 && NPC.ai[1] >= 8) && !p2)
             {
                 List<Vector2> points = AresTeslaOrb.DetermineElectricArcPoints(plug.Center, plug.Center + (NPC.Center - plug.Center) * NPC.ai[2] / 60, 250290787);
-                LightningBackgroundDrawer.Draw(points, -Main.screenPosition, 290);
-                LightningDrawer.Draw(points, -Main.screenPosition, 290);
+                PrimitiveRenderer.RenderTrail(points, new(BackgroundWidthFunction, BackgroundColorFunction, smoothen: false), 90);
+                PrimitiveRenderer.RenderTrail(points, new(WidthFunction, ColorFunction, smoothen: false), 90);
             }
         }
 

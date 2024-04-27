@@ -8,6 +8,11 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using HypnosMod.HypnosNPCs;
 using Terraria.ID;
+using ReLogic.Content;
+using Terraria.Graphics.Shaders;
+using CalamityMod;
+using Terraria.GameContent;
+using Terraria.Graphics.Effects;
 
 namespace HypnosMod
 {
@@ -31,12 +36,30 @@ namespace HypnosMod
 					HypnosBoss.SummonDraedon(Main.player[player]);
 					break;
 			}
-		}
+        }
+        private static void RegisterSceneFilter(ScreenShaderData passReg, string registrationName, EffectPriority priority = EffectPriority.High)
+        {
+            string prefixedRegistrationName = "HypnosMod:" + registrationName;
+            Filters.Scene[prefixedRegistrationName] = new Filter(passReg, priority);
+            Filters.Scene[prefixedRegistrationName].Load();
+        }
 
-		public override void Load()
+        private static void RegisterScreenShader(Effect shader, string passName, string registrationName, EffectPriority priority = EffectPriority.High)
+        {
+            Ref<Effect> shaderPointer = new(shader);
+            ScreenShaderData passParamRegistration = new(shaderPointer, passName);
+            RegisterSceneFilter(passParamRegistration, registrationName, priority);
+        }
+
+        internal static Effect ShieldShader;
+        public override void Load()
         {
             instance = this;
-}
+            AssetRepository calAss = instance.Assets;
+            Effect LoadShader(string path) => calAss.Request<Effect>("Effects/" + path, AssetRequestMode.ImmediateLoad).Value;
+            ShieldShader = LoadShader("HoloShield");
+            RegisterScreenShader(ShieldShader, "ShieldPass", "HoloShieldShader");
+        }
 		public override void PostSetupContent()
 		{
 
@@ -81,6 +104,6 @@ namespace HypnosMod
         public override void Unload()
         {
             instance = null;
-}
-	}
+        }
+    }
 }

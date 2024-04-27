@@ -14,6 +14,8 @@ using CalamityMod.World;
 using CalamityMod.Projectiles.Boss;
 using HypnosMod.Projectiles;
 using CalamityMod.Graphics.Primitives;
+using Terraria.Graphics.Shaders;
+using Terraria.Graphics.Effects;
 
 namespace HypnosMod.HypnosNPCs
 {
@@ -1127,7 +1129,6 @@ namespace HypnosMod.HypnosNPCs
 
         public void drawchain(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-             
             int heighoffset = 20;
             int heighoffsetin = 30;
             int innerdist = 70;
@@ -1211,6 +1212,7 @@ namespace HypnosMod.HypnosNPCs
                 Texture2D texture = TextureAssets.Npc[hypnos.type].Value;
                 Texture2D glowmask = Request<Texture2D>("HypnosMod/HypnosNPCs/Hypnos_Glow").Value;
                 Texture2D eyetexture = Request<Texture2D>("HypnosMod/HypnosNPCs/Hypnos_Eye").Value;
+                Texture2D pipestexture = Request<Texture2D>("HypnosMod/HypnosNPCs/Hypnos_Pipes").Value;
                 Vector2 origin = new Vector2((float)(texture.Width / 2), (float)(texture.Height / Main.npcFrameCount[hypnos.type] / 2));
                 Color white = Color.White;
                 float colorLerpAmt = 0.5f;
@@ -1240,6 +1242,27 @@ namespace HypnosMod.HypnosNPCs
                 spriteBatch.Draw(texture, npcOffset, hypnos.frame, Lighting.GetColor((int)hypnos.position.X / 16, (int)hypnos.position.Y / 16), hypnos.rotation, origin, hypnos.scale, spriteEffects, 0f);
                 spriteBatch.Draw(glowmask, npcOffset, hypnos.frame, glowcolor, hypnos.rotation, origin, hypnos.scale, spriteEffects, 0f);
                 spriteBatch.Draw(eyetexture, npcOffset, hypnos.frame, eyecolor, hypnos.rotation, origin, hypnos.scale, spriteEffects, 0f);
+
+                if (!hypnos.ModNPC<HypnosBoss>().p2)
+                {
+                    spriteBatch.EnterShaderRegion();
+                    var shader = Filters.Scene["HypnosMod:HoloShieldShader"].GetShader().Shader;
+                    shader.Parameters["time"].SetValue(Main.GlobalTimeWrappedHourly);
+                    shader.Parameters["screenPosition"].SetValue(Main.screenPosition);
+                    shader.Parameters["screenSize"].SetValue(Main.ScreenSize.ToVector2());
+                    shader.Parameters["resolution"].SetValue(0.9f);
+
+                    spriteBatch.End();
+                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, shader, Main.GameViewMatrix.TransformationMatrix);
+
+
+                    Texture2D shield = Request<Texture2D>("HypnosMod/HypnosNPCs/HypnosShield").Value;
+                    spriteBatch.Draw(shield, npcOffset - new Vector2(0, 40), null, Color.White, NPC.rotation, shield.Size() / 2, NPC.scale, spriteEffects, 0f);
+
+                    spriteBatch.End();
+                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
+                    spriteBatch.Draw(pipestexture, npcOffset, hypnos.frame, Lighting.GetColor((int)hypnos.position.X / 16, (int)hypnos.position.Y / 16), hypnos.rotation, origin, hypnos.scale, spriteEffects, 0f);
+                }
             }
         }
         public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)

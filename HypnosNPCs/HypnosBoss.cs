@@ -100,6 +100,11 @@ namespace HypnosMod.HypnosNPCs
             if (NPC.CountNPCS(ModContent.NPCType<HypnosPlug>()) <= 0 && NPC.ai[0] > 1)
             {
                 NPC.dontTakeDamage = false;
+                if (!p2 && Main.netMode != NetmodeID.Server)
+                {
+                    ring2 = new BloomRing(NPC.Center, Vector2.Zero, Color.Purple * 1.2f, NPC.scale * 1.5f, 40);
+                    GeneralParticleHandler.SpawnParticle(ring2);
+                }
                 p2 = true;
                 NPC.netUpdate = true;
             }
@@ -120,37 +125,19 @@ namespace HypnosMod.HypnosNPCs
             if (Main.netMode != NetmodeID.Server)
             {
 				if (NPC.ai[0] == 1 && !initializedLocal)
-				{
-					aura = new StrongBloom(NPC.Center, Vector2.Zero, Color.HotPink * 1.1f, NPC.scale * (1f + Main.rand.NextFloat(0f, 1.5f)) * 1.5f, 40);
-					ring = new BloomRing(NPC.Center, Vector2.Zero, Color.Purple * 1.2f, NPC.scale * 1.5f, 40);
-					GeneralParticleHandler.SpawnParticle(aura);
-					GeneralParticleHandler.SpawnParticle(ring);
-					initializedLocal = true;
+                {
+                    initializedLocal = true;
 				}
 				if (ring != null)
-				{
-					ring.Position = NPC.Center;
-					ring.Velocity = NPC.velocity;
-					ring.Time = 0;
-				}
+                {
+                    ring.Scale *= 1.1f;
+                    ring.Time += 1;
+                }
 				if (aura != null)
 				{
 					aura.Position = NPC.Center;
 					aura.Velocity = NPC.velocity;
 					aura.Time = 0;
-				}
-				if (p2)
-				{
-					if (ring != null)
-					{
-						ring.Scale *= 1.1f;
-						ring.Time += 1;
-					}
-
-					if (aura != null)
-					{
-						aura?.Kill();
-					}
 				}
 				if (ring2 != null)
 				{

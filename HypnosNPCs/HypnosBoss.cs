@@ -28,6 +28,7 @@ using HypnosMod.Items;
 using HypnosMod.Projectiles;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.Audio;
+using Terraria.Localization;
 
 namespace HypnosMod.HypnosNPCs
 {
@@ -75,13 +76,12 @@ namespace HypnosMod.HypnosNPCs
             NPC.dontTakeDamage = true;
             NPC.damage = 1;
             NPC.defense = 90;
-            Music = MusicLoader.GetMusicSlot(Mod, "Sounds/Music/HypnosSong");
         }
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
         {
             bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[] {
-                new FlavorTextBestiaryInfoElement("A cerebral dreadnaught, and quite possibly one of Draedon’s finest creations. While the usage of gray matter is questionable, the feat of getting a brain to interface with cybernetics is impressive.")
+                new FlavorTextBestiaryInfoElement(Language.GetTextValue("Mods.HypnosMod.Hypnos.Bestiary"))
             });
         }
 
@@ -802,6 +802,10 @@ namespace HypnosMod.HypnosNPCs
                 // Equipment
                 normalOnly.Add(ModContent.ItemType<ExoThrone>());
                 normalOnly.Add(ModContent.ItemType<DraedonsHeart>());
+                // Weapons from this addon (25% each in Normal mode)
+                normalOnly.Add(ModContent.ItemType<AergianTechnistaff>(), 4);
+                normalOnly.Add(ModContent.ItemType<Neuraze>(), 4);
+                normalOnly.Add(ModContent.ItemType<Planetarium>(), 4);
 
                 // Vanity
                 // Higher chance due to how the drops work

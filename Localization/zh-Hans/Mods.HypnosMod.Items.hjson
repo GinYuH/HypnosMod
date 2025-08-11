@@ -12,3 +12,33 @@ HypnosMusicBox: {
 	DisplayName: 音乐盒 (修普诺斯)
 	Tooltip: ""
 }
+
+AergianTechnistaff: {
+	DisplayName: 艾姬娅智械之杖
+	Tooltip:
+		'''
+		召唤一个环绕你运动的艾姬娅神经元
+		按住右键可加速环轨旋转
+		到达最高速度后会将其掷出，持续追踪敌人
+		'''
+}
+
+Neuraze: {
+	DisplayName: 神经矩阵
+	Tooltip:
+		'''
+		高速发射出5发散射的子弹
+		取用背包中优先级最高的5种子弹
+		80%概率不消耗弹药
+		'''
+}
+
+Planetarium: {
+	Tooltip:
+	'''
+	今晚，无数的流星划过天际……
+	如果你能选中那颗合适的流星……
+	……它将把你的愿望带到数千个遥远的星球上。
+	'''
+	DisplayName: 星穹演算引擎
+}

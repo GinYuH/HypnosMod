@@ -14,5 +14,22 @@ Draedon: {
 	Line13: And please. Dislodge that blood clot from my device the next time you use it.
 }
 
+Hypnos.Bestiary: A cerebral dreadnaught, and quite possibly one of Draedon’s finest creations. While the usage of gray matter is questionable, the feat of getting a brain to interface with cybernetics is impressive.
+
+BossChecklist: {
+	Hypnos: {
+		EntryName: XP-00 Hypnos
+		SpawnInfo: Jam a [i:CalamityMod/BloodyVein] into the Codebreaker.
+		Flavor: An imperfection after all… what a shame.
+	}
+}
+
 // Emote
 Emotes.HypnosEmote.Command: hypnos
+
+Buffs: {
+	AergiaNeuronBuff: {
+		DisplayName: Aergia Neuron Buff
+		Description: Eepy neurons on forced overtime
+	}
+}

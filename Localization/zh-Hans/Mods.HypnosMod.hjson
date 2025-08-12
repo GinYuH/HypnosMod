@@ -1,6 +1,6 @@
 Draedon: {
 	Line1: 真是奇特。你对密码破译器的改造让它发出了我未曾设想的召唤信号。
-	Line2: 你先前的战斗已经让我兴趣盎然，而你如今的创造力更让刮目相看。
+	Line2: 你先前的战斗已经让我兴趣盎然，而你如今的创造力更让我刮目相看。
 	Line3: 你将面对我的一件更早期的造物。但是你最好不要低估它。
 	Line4: 让我们开始吧。
 	Line5: 那些连接附属装置与本体的线缆，充其量也只是勉强可用，效率极低。
@@ -14,5 +14,26 @@ Draedon: {
 	Line13: ……还有，下次使用前，请清除装置中的血块。
 }
 
+Hypnos.Bestiary: 以活体大脑为中枢的无畏巨像，极有可能是嘉登最出色的造物之一。尽管他对脑灰质的使用手段颇有争议，但能让大脑与赛博义体实现对接的壮举，确实令人叹服。
+
+BossChecklist: {
+	Hypnos: {
+		EntryName: XP-00 修普诺斯
+		SpawnInfo: 对密码破译器使用[i:CalamityMod/BloodyVein]。
+		Flavor: 终究还是瑕疵造物吗……真是可惜。
+	}
+}
+
+Hypnos: {
+	HealthBarExtension: XP-00 修普诺斯
+}
+
 // Emote
 Emotes.HypnosEmote.Command: 星流之脑
+
+Buffs: {
+	AergiaNeuronBuff: {
+		DisplayName: 艾姬娅神经束
+		Description: “困困神经元被迫加班中”
+	}
+}

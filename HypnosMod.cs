@@ -13,6 +13,8 @@ using Terraria.Graphics.Shaders;
 using CalamityMod;
 using Terraria.GameContent;
 using Terraria.Graphics.Effects;
+using Terraria.Localization;
+using HypnosMod.Items;
 
 namespace HypnosMod
 {
@@ -62,42 +64,92 @@ namespace HypnosMod
         }
 		public override void PostSetupContent()
 		{
-
-			Mod cal = ModLoader.GetMod("CalamityMod");
-			//cal.Call("DeclareOneToManyRelationshipForHealthBar", ModContent.NPCType<HypnosBoss>(), ModContent.NPCType<HypnosPlug>());
-			List<(int, int, Action<int>, int, bool, float, int[], int[])> brEntries = (List<(int, int, Action<int>, int, bool, float, int[], int[])>)cal.Call("GetBossRushEntries");
-			int[] excIDs = { ModContent.NPCType<AergiaNeuron>(), ModContent.NPCType<HypnosPlug>() };
-			int[] headID = { ModContent.NPCType<HypnosBoss>() };
-			Action<int> pr = delegate (int npc) 
+			try
 			{
-				NPC.SpawnOnPlayer(CalamityMod.Events.BossRushEvent.ClosestPlayerToWorldCenter, ModContent.NPCType<HypnosBoss>()); 
-			};
-			brEntries.Insert(brEntries.Count() - 2, (ModContent.NPCType<HypnosBoss>(), -1, pr, 180, false, 0f, excIDs, headID));
-			cal.Call("SetBossRushEntries", brEntries);
+				Mod cal = ModLoader.GetMod("CalamityMod");
+				// --- Calamity shared boss health bar integration ---
+				// 1. Declare one-to-many relationship (main boss -> subordinate/parts)
+				cal.Call("DeclareOneToManyRelationshipForHealthBar", ModContent.NPCType<HypnosBoss>(), ModContent.NPCType<HypnosPlug>());
+				// 2. Exclude the subordinate so it does not get its own bar
+				cal.Call("ExcludeBossFromHealthBar", ModContent.NPCType<HypnosPlug>());
+				// 3. Register custom HP calculation: aggregate all active HypnosPlug HP into HypnosBoss bar
+				cal.Call("DeclareSpecialHPCalculationDecisionForHealthBar",
+					(Func<NPC, bool>)(n => n.type == ModContent.NPCType<HypnosBoss>()),
+					(Func<NPC, bool, long>)((n, accumulatingMax) =>
+					{
+						long total = accumulatingMax ? n.lifeMax : n.life;
+						int plugType = ModContent.NPCType<HypnosPlug>();
+						for (int i = 0; i < Main.maxNPCs; i++)
+						{
+							NPC other = Main.npc[i];
+							if (other.active && other.type == plugType)
+								total += accumulatingMax ? other.lifeMax : Math.Max(0, other.life);
+						}
+						return total;
+					})
+				);
+				// 4. Create name extension handler so the health bar can use a localized name (and optionally conditions if parts exist)
+				LocalizedText extName = Language.GetText("Mods.HypnosMod.Hypnos.HealthBarExtension");
+				cal.Call("CreateNameExtensionHandlerForHealthBar", extName, ModContent.NPCType<HypnosBoss>(), ModContent.NPCType<HypnosPlug>());
+				Logger.Info("[HypnosMod] Registered shared health bar (HypnosBoss + HypnosPlug)");
+				var brEntries = (List<(int, int, Action<int>, int, bool, float, int[], int[])>)cal.Call("GetBossRushEntries");
+				int[] excIDs = { ModContent.NPCType<AergiaNeuron>(), ModContent.NPCType<HypnosPlug>() };
+				int[] headID = { ModContent.NPCType<HypnosBoss>() };
+				Action<int> pr = delegate (int npc)
+				{
+					NPC.SpawnOnPlayer(CalamityMod.Events.BossRushEvent.ClosestPlayerToWorldCenter, ModContent.NPCType<HypnosBoss>());
+				};
+				brEntries.Insert(brEntries.Count() - 2, (ModContent.NPCType<HypnosBoss>(), -1, pr, 180, false, 0f, excIDs, headID));
+				cal.Call("SetBossRushEntries", brEntries);
+			}
+			catch { /* ignore Calamity Boss Rush integration failures to not block other integrations */ }
 
 			{
 				Mod bossChecklist;
 				ModLoader.TryGetMod("BossChecklist", out bossChecklist);
 				if (bossChecklist != null)
 				{
-					bossChecklist.Call(new object[12]
-				{
-				"AddBoss",
-				22.5f,
-				ModContent.NPCType<HypnosNPCs.HypnosBoss>(),
-				this,
-				"XP-00 Hypnos",
-				(Func<bool>)(() => HypnosWorld.downedHypnos),
-				ModContent.ItemType<CalamityMod.Items.Pets.BloodyVein>(),
-				null,
-				new List<int>
-				{
-					ModLoader.GetMod("CalamityMod").Find<ModItem>("ExoPrism").Type
-				},
-				$"Jam a [i:{ModContent.ItemType<CalamityMod.Items.Pets.BloodyVein>()}] into the codebreaker",
-				"An imperfection after allÅc what a shame.",
-				null
-				});
+					// Follow Calamity's BossChecklist integration style: LogBoss with entryName and data dict
+					string entryName = "Hypnos"; // unique key used by BossChecklist
+					float order = 22.5f; // After Yharon (22.0), before Exo Mechs (22.99)
+					var displayName = Language.GetText("Mods.HypnosMod.BossChecklist.Hypnos.EntryName");
+					var spawnInfoLoc = Language.GetText("Mods.HypnosMod.BossChecklist.Hypnos.SpawnInfo");
+					var despawnMessage = Language.GetText("Mods.HypnosMod.BossChecklist.Hypnos.Flavor");
+					var collectibles = new List<int>
+					{
+						ModContent.ItemType<CalamityMod.Items.Materials.ExoPrism>(),
+						ModContent.ItemType<HypnosTrophyInv>(),
+						ModContent.ItemType<HypnosMask>()
+					};
+					// Resolve BloodyVein item id for icon in the spawn info panel.
+					int spawnItemId = 0;
+					if (ModLoader.TryGetMod("CalamityMod", out Mod calamityMod))
+					{
+						if (calamityMod.TryFind<ModItem>("BloodyVein", out var item))
+							spawnItemId = item.Type;
+					}
+
+					var bcData = new Dictionary<string, object>
+					{
+						["displayName"] = displayName,
+						["spawnInfo"] = spawnInfoLoc,
+						["despawnMessage"] = despawnMessage,
+						["collectibles"] = collectibles
+					};
+					if (spawnItemId > 0)
+						bcData["spawnItems"] = spawnItemId;
+					// Prefer modern API: LogBoss
+					try
+					{
+						bossChecklist.Call("LogBoss", this, entryName, order, (Func<bool>)(() => HypnosWorld.downedHypnos), ModContent.NPCType<HypnosNPCs.HypnosBoss>(), bcData);
+						Logger.Info("[HypnosMod] BossChecklist: registered via LogBoss");
+					}
+					catch
+					{
+						// Fallback to AddBoss if LogBoss is unavailable
+						bossChecklist.Call("AddBoss", this, displayName.Value, order, (Func<bool>)(() => HypnosWorld.downedHypnos), new int[] { ModContent.NPCType<HypnosNPCs.HypnosBoss>() }, bcData);
+						Logger.Info("[HypnosMod] BossChecklist: registered via AddBoss fallback");
+					}
 				}
 			}
 		}

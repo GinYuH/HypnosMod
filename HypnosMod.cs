@@ -67,12 +67,31 @@ namespace HypnosMod
 			try
 			{
 				Mod cal = ModLoader.GetMod("CalamityMod");
-				cal?.Call(
-					"DeclareOneToManyRelationshipForHealthBar",
-					ModContent.NPCType<HypnosNPCs.HypnosBoss>(),
-					ModContent.NPCType<HypnosNPCs.AergiaNeuron>(),
-					ModContent.NPCType<HypnosNPCs.HypnosPlug>()
+				// --- Calamity shared boss health bar integration ---
+				// 1. Declare one-to-many relationship (main boss -> subordinate/parts)
+				cal.Call("DeclareOneToManyRelationshipForHealthBar", ModContent.NPCType<HypnosBoss>(), ModContent.NPCType<HypnosPlug>());
+				// 2. Exclude the subordinate so it does not get its own bar
+				cal.Call("ExcludeBossFromHealthBar", ModContent.NPCType<HypnosPlug>());
+				// 3. Register custom HP calculation: aggregate all active HypnosPlug HP into HypnosBoss bar
+				cal.Call("DeclareSpecialHPCalculationDecisionForHealthBar",
+					(Func<NPC, bool>)(n => n.type == ModContent.NPCType<HypnosBoss>()),
+					(Func<NPC, bool, long>)((n, accumulatingMax) =>
+					{
+						long total = accumulatingMax ? n.lifeMax : n.life;
+						int plugType = ModContent.NPCType<HypnosPlug>();
+						for (int i = 0; i < Main.maxNPCs; i++)
+						{
+							NPC other = Main.npc[i];
+							if (other.active && other.type == plugType)
+								total += accumulatingMax ? other.lifeMax : Math.Max(0, other.life);
+						}
+						return total;
+					})
 				);
+				// 4. Create name extension handler so the health bar can use a localized name (and optionally conditions if parts exist)
+				LocalizedText extName = Language.GetText("Mods.HypnosMod.Hypnos.HealthBarExtension");
+				cal.Call("CreateNameExtensionHandlerForHealthBar", extName, ModContent.NPCType<HypnosBoss>(), ModContent.NPCType<HypnosPlug>());
+				Logger.Info("[HypnosMod] Registered shared health bar (HypnosBoss + HypnosPlug)");
 				var brEntries = (List<(int, int, Action<int>, int, bool, float, int[], int[])>)cal.Call("GetBossRushEntries");
 				int[] excIDs = { ModContent.NPCType<AergiaNeuron>(), ModContent.NPCType<HypnosPlug>() };
 				int[] headID = { ModContent.NPCType<HypnosBoss>() };

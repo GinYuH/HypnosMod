@@ -24,6 +24,10 @@ BossChecklist: {
 	}
 }
 
+Hypnos: {
+	HealthBarExtension: XP-00 Hypnos
+}
+
 // Emote
 Emotes.HypnosEmote.Command: hypnos
 

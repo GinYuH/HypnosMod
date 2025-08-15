@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -11,6 +12,7 @@ using CalamityMod.Particles;
 using Microsoft.Xna.Framework.Graphics;
 using CalamityMod;
 using static CalamityMod.World.CalamityWorld;
+using CalamityMod.Skies;
 using CalamityMod.Items.Accessories;
 using CalamityMod.Items.Armor.Vanity;
 using CalamityMod.Items.LoreItems;
@@ -29,6 +31,9 @@ using HypnosMod.Projectiles;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.Audio;
 using Terraria.Localization;
+using CalamityMod.NPCs.ExoMechs.Ares;
+using CalamityMod.NPCs.ExoMechs.Artemis;
+using Terraria.Graphics.Effects;
 
 namespace HypnosMod.HypnosNPCs
 {
@@ -49,6 +54,10 @@ namespace HypnosMod.HypnosNPCs
         public int hostdamage = 400;
         public int beserktimer = 0;
 
+    // Remix-style intro assemblage support
+    public List<HypnosAssemblagePiece> assemblagePieces = new List<HypnosAssemblagePiece>();
+    public int brainFrame = 0;
+
         public ThanatosSmokeParticleSet SmokeDrawer = new ThanatosSmokeParticleSet(-1, 3, 0f, 16f, 1.5f);
         public override void SetStaticDefaults()
         {
@@ -67,7 +76,8 @@ namespace HypnosMod.HypnosNPCs
             NPC.LifeMaxNERB(1320000, 1980000);
             double HPBoost = CalamityConfig.Instance.BossHealthBoost * 0.01;
             NPC.lifeMax += (int)(NPC.lifeMax * HPBoost);
-            NPC.DeathSound = SoundID.Item14;
+            // Use Remix death sound for better presentation
+            NPC.DeathSound = CalamityMod.Sounds.CommonCalamitySounds.ExoDeathSound;
             NPC.knockBackResist = 0f;
             NPC.noTileCollide = true;
             NPC.width = 208;
@@ -76,6 +86,8 @@ namespace HypnosMod.HypnosNPCs
             NPC.dontTakeDamage = true;
             NPC.damage = 1;
             NPC.defense = 90;
+            // Fade-in like Remix during intro
+            NPC.alpha = 255;
         }
 
         public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
@@ -96,6 +108,16 @@ namespace HypnosMod.HypnosNPCs
             //Boss zen
             Main.player[Main.myPlayer].Calamity().isNearbyBoss = true;
             Main.player[Main.myPlayer].AddBuff(ModContent.BuffType<CalamityMod.Buffs.StatBuffs.BossEffects>(), 10, true);
+            // Keep ExoMechs sky active for the whole fight on client so lightning continues
+            if (Main.netMode != NetmodeID.Server)
+            {
+                var cp = Main.LocalPlayer?.Calamity();
+                if (cp != null)
+                {
+                    cp.monolithExoShader = Math.Max(cp.monolithExoShader, 10);
+                    try { SkyManager.Instance.Activate("CalamityMod:ExoMechs"); } catch { }
+                }
+            }
             //Handle transitioning to phase 2
             if (NPC.CountNPCS(ModContent.NPCType<HypnosPlug>()) <= 0 && NPC.ai[0] > 1)
             {
@@ -169,57 +191,100 @@ namespace HypnosMod.HypnosNPCs
             //The sweet juicy AI
             switch (NPC.ai[0])
             {
-                case 0: //Spawn animation
+                case 0: // Remix-style Spawn animation (assemblage from Brain of Cthulhu)
                     {
                         NPC.ai[1]++;
+                        NPC.alpha = (int)MathHelper.Max(NPC.alpha - 20, 0); // fade-in
                         NPC.damage = 0;
-                        if (NPC.ai[1] < 120)
+
+                        // Timeline checkpoints
+                        int start = 60;
+                        int placelower = start + 30;
+                        int placeupper = placelower + 30;
+                        int placecrown = placeupper + 30;
+                        int placebowl = placecrown + 30;
+                        int startanim = placebowl + 60;
+                        int totaltime = startanim + 70;
+
+                        if (NPC.ai[1] < totaltime)
                         {
-                            if (Main.rand.NextBool(2))
+                            if (NPC.ai[1] == start + 1)
                             {
-                                if (!Main.dedServ)
+                                int xStart = 210;
+                                int yStart = -50;
+                                int xEnd = 69;
+                                int yEnd = -33;
+                                CreatePiece(NPC.Center + new Vector2(xStart, yStart), "Side", 0f, false, NPC.Center + new Vector2(xEnd, yEnd), 10, -0.2f);
+                                CreatePiece(NPC.Center + new Vector2(-xStart, yStart), "Side", 0f, true, NPC.Center + new Vector2(-xEnd, yEnd), 10, -0.2f);
+                            }
+                            if (NPC.ai[1] == placelower)
+                            {
+                                int xStart = 170;
+                                int yStart = -90;
+                                int xEnd = 70;
+                                int yEnd = -70;
+                                CreatePiece(NPC.Center + new Vector2(xStart, yStart), "LowerTube", 0f, false, NPC.Center + new Vector2(xEnd, yEnd), 6, 0.1f);
+                                CreatePiece(NPC.Center + new Vector2(-xStart, yStart), "LowerTube", 0f, true, NPC.Center + new Vector2(-xEnd, yEnd), 6, 0.1f);
+                            }
+                            if (NPC.ai[1] == placeupper)
+                            {
+                                int xStart = 170;
+                                int yStart = -120;
+                                int xEnd = 60;
+                                int yEnd = -96;
+                                CreatePiece(NPC.Center + new Vector2(xStart, yStart), "UpperTube", 0f, false, NPC.Center + new Vector2(xEnd, yEnd), 6, 0.3f);
+                                CreatePiece(NPC.Center + new Vector2(-xStart, yStart), "UpperTube", 0f, true, NPC.Center + new Vector2(-xEnd, yEnd), 6, 0.3f);
+                            }
+                            if (NPC.ai[1] == placecrown)
+                            {
+                                CreatePiece(NPC.Center + new Vector2(0, -200), "Crown", 0f, false, NPC.Center + new Vector2(0, -41), 10, 0.5f);
+                            }
+                            if (NPC.ai[1] == placebowl)
+                            {
+                                CreatePiece(NPC.Center + new Vector2(0, 200), "Wires", 0f, false, NPC.Center + new Vector2(0, 0), 10, 0.8f);
+                            }
+                            if (NPC.ai[1] >= startanim)
+                            {
+                                if (NPC.localAI[1] == 0.3f)
                                 {
-									int num5 = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Electric, 0f, 0f, 200, default, 1.5f);
-									Main.dust[num5].noGravity = true;
-									Main.dust[num5].velocity *= 0.75f;
-									Main.dust[num5].fadeIn = 1.3f;
-									Vector2 vector = new Vector2((float)Main.rand.Next(-400, 401), (float)Main.rand.Next(-400, 401));
-									vector.Normalize();
-									vector *= (float)Main.rand.Next(100, 200) * 0.04f;
-									Main.dust[num5].velocity = vector;
-									vector.Normalize();
-									vector *= 34f;
-									Main.dust[num5].position = NPC.Center - vector;
-								}
-                               
+                                    SoundEngine.PlaySound(AresTeslaCannon.TeslaOrbShootSound with { Volume = 0.75f }, NPC.Center);
+                                }
+                                if (NPC.localAI[1] == 1.7f)
+                                {
+                                    SoundEngine.PlaySound(Artemis.ChargeTelegraphSound with { Volume = 1f }, NPC.Center);
+                                }
+                                NPC.localAI[1] += 0.05f;
                             }
                         }
                         else
                         {
+                            // Spawn the 4 plugs like original
                             for (int i = 0; i < 4; i++)
                             {
-                                //if (Main.netMode != NetmodeID.MultiplayerClient)
                                 NPC.NewNPCDirect(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<HypnosPlug>(), 0, NPC.whoAmI, i);
                             }
-                            for (int l = 0; l < 48; l++)
-                            {
-                                Vector2 vector3 = Vector2.UnitX * (float)-(float)NPC.width / 2f;
-                                vector3 += -Vector2.UnitY.RotatedBy((double)((float)l * 3.14159274f / 6f), default) * new Vector2(8f, 16f);
-                                int num9 = Dust.NewDust(NPC.Center, 0, 0, DustID.FireworkFountain_Blue, 0f, 0f, 160, default, 1f);
-                                Main.dust[num9].scale = 1.1f;
-                                Main.dust[num9].noGravity = true;
-                                Main.dust[num9].position = NPC.Center + vector3;
-                                Main.dust[num9].velocity = NPC.velocity * 0.1f;
-                                Main.dust[num9].velocity = Vector2.Normalize(NPC.Center - NPC.velocity * 3f - Main.dust[num9].position) * 1.25f;
-                            }
-                            Terraria.Audio.SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.FlareSound, NPC.Center);
+
+                            // Sky lightning and flare sound on client only (safe + dedupe)
+                            TriggerSpawnLightningClientSafe();
+                            assemblagePieces.Clear();
+
                             ChangePhase(1);
+                        }
+
+                        // drive piece movement each tick
+                        if (assemblagePieces != null && assemblagePieces.Count > 0)
+                        {
+                            foreach (HypnosAssemblagePiece piece in assemblagePieces)
+                                piece.Move();
                         }
                     }
                     break;
                 case 1: //Move downward
                     {
                         NPC.ai[1]++;
+                        // Failsafe: if lightning wasn't shown due to net order, show it now on client once
+                        if (NPC.ai[1] == 1 && NPC.localAI[2] == 0f)
+                            TriggerSpawnLightningClientSafe();
                         afterimages = true;
                         Vector2 playerpos = new Vector2(Main.player[NPC.target].Center.X, Main.player[NPC.target].Center.Y + 200);
                         Vector2 distanceFromDestination = playerpos - NPC.Center;
@@ -723,9 +788,22 @@ namespace HypnosMod.HypnosNPCs
             NPC.frameCounter %= Main.npcFrameCount[NPC.type];
             int frame = (int)NPC.frameCounter;
             NPC.frame.Y = frame * frameHeight;
+            // Drive brain animation speed during intro like Remix
+            NPC.localAI[0]++;
+            int gate = 6;
+            if (NPC.ai[1] > 91)
+                gate = 4;
+            if (NPC.localAI[0] % gate == 0)
+            {
+                brainFrame++;
+                if (brainFrame == 3)
+                    brainFrame = 0;
+            }
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            Texture2D eyetexture = Request<Texture2D>("HypnosMod/HypnosNPCs/Hypnos_Eye").Value;
+            Texture2D glowmask = Request<Texture2D>("HypnosMod/HypnosNPCs/Hypnos_Glow").Value;
             if (NPC.IsABestiaryIconDummy)
             {
                 SpriteEffects spriteEffects = SpriteEffects.None;
@@ -733,8 +811,6 @@ namespace HypnosMod.HypnosNPCs
                     spriteEffects = SpriteEffects.FlipHorizontally;
 
                 Texture2D texture = TextureAssets.Npc[NPC.type].Value;
-                Texture2D glowmask = Request<Texture2D>("HypnosMod/HypnosNPCs/Hypnos_Glow").Value;
-                Texture2D eyetexture = Request<Texture2D>("HypnosMod/HypnosNPCs/Hypnos_Eye").Value;
                 Vector2 origin = new Vector2((float)(texture.Width / 2), (float)(texture.Height / Main.npcFrameCount[NPC.type] / 2));
                 Color white = Color.White;
                 float colorLerpAmt = 0.5f;
@@ -765,9 +841,52 @@ namespace HypnosMod.HypnosNPCs
                 spriteBatch.Draw(glowmask, npcOffset, NPC.frame, glowcolor, NPC.rotation, origin, NPC.scale, spriteEffects, 0f);
                 spriteBatch.Draw(eyetexture, npcOffset, NPC.frame, Color.White, NPC.rotation, origin, NPC.scale, spriteEffects, 0f);
             }
+            else if (NPC.ai[0] == 0)
+            {
+                // Intro disguise: draw Brain of Cthulhu body and assemblage parts
+                Texture2D brian = ModContent.Request<Texture2D>("Terraria/Images/NPC_266").Value;
+                Vector2 origin = new Vector2((float)(brian.Width / 2), (float)(brian.Height / 8));
+                Vector2 npcOffset = NPC.Center - screenPos;
+                npcOffset -= new Vector2((float)brian.Width, (float)(brian.Height / 4)) * NPC.scale / 2f;
+                npcOffset += origin * NPC.scale + new Vector2(0f, NPC.gfxOffY + 100);
+
+                int hideSpine = 0;
+                if (NPC.ai[1] > 195)
+                    hideSpine = (int)MathHelper.Max((int)MathHelper.Lerp(0, -80, (NPC.ai[1] - 195) / 2), -80);
+
+                spriteBatch.Draw(brian, npcOffset, brian.Frame(1, 8, 0, brainFrame, sizeOffsetY: hideSpine), NPC.GetAlpha(drawColor), NPC.rotation, origin, NPC.scale * 0.95f, SpriteEffects.None, 0f);
+
+                // Draw assemblage pieces (textures are expected in HypnosMod/HypnosNPCs/Assemblage*)
+                if (assemblagePieces != null && assemblagePieces.Count > 0)
+                {
+                    foreach (HypnosAssemblagePiece piece in assemblagePieces)
+                    {
+                        Texture2D tex = ModContent.Request<Texture2D>("HypnosMod/HypnosNPCs/Assemblage" + piece.texture).Value;
+                        Vector2 texHalf = new Vector2(tex.Width, tex.Height) * 0.5f;
+                        spriteBatch.Draw(tex, piece.position - screenPos + Vector2.UnitY * 40, null, NPC.GetAlpha(drawColor) * (0.00392156863f * piece.opacity), 0, texHalf, NPC.scale, piece.leftSide ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 1);
+                    }
+                }
+
+                // Eye/glow flicker near the end of the intro
+                int flickrate = (int)MathHelper.Lerp(5, 2, NPC.localAI[1] / 2);
+                bool flickOn = NPC.localAI[1] >= 2 ? true : Main.rand.NextBool(flickrate);
+                if (NPC.ai[1] > 240)
+                {
+                    if (flickOn)
+                    {
+                        spriteBatch.Draw(eyetexture, npcOffset + new Vector2(-4, 11), eyetexture.Frame(1, 4, 0, 0), Color.White * MathHelper.Clamp(NPC.localAI[1], 0, 1), NPC.rotation, origin, NPC.scale, SpriteEffects.None, 0f);
+                        spriteBatch.Draw(glowmask, npcOffset + new Vector2(-4, 11), eyetexture.Frame(1, 4, 0, 0), Color.White * MathHelper.Clamp(NPC.localAI[1], 0, 1), NPC.rotation, origin, NPC.scale, SpriteEffects.None, 0f);
+                    }
+                }
+            }
 
             SmokeDrawer.DrawSet(NPC.Center);
             return false;
+        }
+        public override void ModifyTypeName(ref string typeName)
+        {
+            // Disguise as Brain of Cthulhu during intro timeline
+            typeName = (NPC.ai[0] == 0 && NPC.ai[1] > 0) ? ContentSamples.NpcsByNetId[NPCID.BrainofCthulhu].TypeName : typeName;
         }
         public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment)
         {
@@ -823,6 +942,8 @@ namespace HypnosMod.HypnosNPCs
                     aura.Kill();
                 if (ring != null)
                     ring.Kill();
+                // Reset sky boost on client when fight ends
+                try { var cp = Main.LocalPlayer?.Calamity(); if (cp != null) cp.monolithExoShader = 0; } catch { }
             }
 
             if (NPC.life <= 0)
@@ -883,5 +1004,103 @@ namespace HypnosMod.HypnosNPCs
 			NPC.NewNPC(new Terraria.DataStructures.EntitySource_BossSpawn(player), (int)player.Center.X, (int)(player.Center.Y - 1200), NPCType<Draedon>(), 0, 0, 0, 0, player.whoAmI, player.whoAmI);
 
 		}
+
+        // Helpers for Remix-style assemblage
+        public HypnosAssemblagePiece CreatePiece(Vector2 position, string texture, float opacity, bool leftSide, Vector2 destination, float power, float pitch)
+        {
+            HypnosAssemblagePiece piece = new HypnosAssemblagePiece(position, texture, opacity, leftSide, destination, power, pitch);
+            assemblagePieces.Add(piece);
+            return piece;
+        }
+
+        // Client-safe trigger for ExoMechs sky lightning with a tiny particle fallback
+        private void TriggerSpawnLightningClientSafe()
+        {
+            if (Main.netMode == NetmodeID.Server)
+                return;
+
+            if (NPC.localAI[2] >= 1f)
+                return; // already played locally
+
+            bool played = false;
+            try
+            {
+                // Ensure the sky draws even when ExoMechs/Draedon are not present
+                var cp = Main.LocalPlayer?.Calamity();
+                if (cp != null)
+                    cp.monolithExoShader = Math.Max(cp.monolithExoShader, 5);
+
+                try { SkyManager.Instance.Activate("CalamityMod:ExoMechs"); } catch { }
+                ExoMechsSky.CreateLightningBolt(22, true);
+                played = true;
+            }
+            catch
+            {
+                // Fallback: subtle particles so players still get feedback if the sky effect isn't available
+                try
+                {
+                    Color c = Color.Lerp(Color.CornflowerBlue, Color.White, 0.5f) * 0.9f;
+                    for (int i = 0; i < 6; i++)
+                    {
+                        var ring = new BloomRing(NPC.Center, Main.rand.NextVector2Circular(2f, 2f), c, NPC.scale * Main.rand.NextFloat(1.2f, 1.8f), 30 + i * 3);
+                        GeneralParticleHandler.SpawnParticle(ring);
+                    }
+                    Main.LocalPlayer.Calamity().GeneralScreenShakePower = Math.Max(Main.LocalPlayer.Calamity().GeneralScreenShakePower, 6f);
+                }
+                catch { }
+            }
+
+            try
+            {
+                SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.FlareSound, NPC.Center);
+            }
+            catch { }
+
+            NPC.localAI[2] = played ? 1f : 0.5f; // mark as handled to avoid repeats
+        }
 	}
+
+    // Local copy of Remix's piece class (trimmed to essentials) to avoid CalRemix dependency
+    public class HypnosAssemblagePiece
+    {
+        public Vector2 position;
+        public string texture;
+        public float opacity;
+        public bool leftSide;
+        public Vector2 destination;
+        public float time = -1f;
+        public bool playedEffect = false;
+        public float power;
+        public float pitch;
+
+        public HypnosAssemblagePiece(Vector2 position, string texture, float opacity, bool leftSide, Vector2 destination, float power, float pitch)
+        {
+            this.position = position;
+            this.texture = texture;
+            this.opacity = opacity;
+            this.leftSide = leftSide;
+            this.destination = destination;
+            this.power = power;
+            this.pitch = pitch;
+        }
+
+        public void Move()
+        {
+            time += 0.1f;
+            if (time > 0)
+                position = Vector2.Lerp(position, destination, time);
+
+            if (opacity < 255)
+                opacity += 30;
+            else
+                opacity = 255;
+
+            if (time >= 1 && !playedEffect)
+            {
+                SoundEngine.PlaySound(CalamityMod.Sounds.CommonCalamitySounds.ExoHitSound with { Pitch = pitch }, position);
+                Main.LocalPlayer.Calamity().GeneralScreenShakePower = power;
+                playedEffect = true;
+            }
+        }
+    }
 }

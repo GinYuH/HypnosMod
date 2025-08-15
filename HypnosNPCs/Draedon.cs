@@ -66,6 +66,8 @@ namespace HypnosMod.HypnosNPCs
 
 			Player player = Main.player[PlayerWhoAmI];
 
+
+
 			
             NPC.dontTakeDamage = true;
             int basetime = 120;
@@ -199,6 +201,7 @@ namespace HypnosMod.HypnosNPCs
                     break;
             }
         }
+
 
         public override bool CheckActive()
         {

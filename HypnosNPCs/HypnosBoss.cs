@@ -930,7 +930,6 @@ namespace HypnosMod.HypnosNPCs
                 // Vanity
                 normalOnly.Add(ModContent.ItemType<DraedonMask>(), 3);
             }
-            HypnosWorld.downedHypnos = true;
         }
 
         public override void OnKill()

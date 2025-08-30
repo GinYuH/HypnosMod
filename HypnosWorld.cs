@@ -40,7 +40,8 @@ namespace HypnosMod
 
 		public override void LoadWorldData(TagCompound tag)
 		{
-            downedHypnos = tag.Get<bool>("downedHypnos");
+			// In new worlds the key may not exist; default to false.
+			downedHypnos = tag.ContainsKey("downedHypnos") ? tag.Get<bool>("downedHypnos") : false;
 		}
 		public override void NetSend(BinaryWriter writer)
 		{

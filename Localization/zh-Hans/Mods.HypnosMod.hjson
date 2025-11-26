@@ -14,7 +14,10 @@ Draedon: {
 	Line13: ……还有，下次使用前，请清除装置中的血块。
 }
 
-Hypnos.Bestiary: 以活体大脑为中枢的无畏巨像，极有可能是嘉登最出色的造物之一。尽管他对脑灰质的使用手段颇有争议，但能让大脑与赛博义体实现对接的壮举，确实令人叹服。
+Hypnos: {
+	Bestiary: 以活体大脑为中枢的无畏巨像，极有可能是嘉登最出色的造物之一。尽管他对脑灰质的使用手段颇有争议，但能让大脑与赛博义体实现对接的壮举，确实令人叹服。
+	HealthBarExtension: XP-00 修普诺斯
+}
 
 BossChecklist: {
 	Hypnos: {
@@ -22,10 +25,6 @@ BossChecklist: {
 		SpawnInfo: 对密码破译器使用[i:CalamityMod/BloodyVein]。
 		Flavor: 终究还是瑕疵造物吗……真是可惜。
 	}
-}
-
-Hypnos: {
-	HealthBarExtension: XP-00 修普诺斯
 }
 
 // Emote

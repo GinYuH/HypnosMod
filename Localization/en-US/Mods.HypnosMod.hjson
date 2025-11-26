@@ -14,7 +14,10 @@ Draedon: {
 	Line13: And please. Dislodge that blood clot from my device the next time you use it.
 }
 
-Hypnos.Bestiary: A cerebral dreadnaught, and quite possibly one of Draedon’s finest creations. While the usage of gray matter is questionable, the feat of getting a brain to interface with cybernetics is impressive.
+Hypnos: {
+	Bestiary: A cerebral dreadnaught, and quite possibly one of Draedon’s finest creations. While the usage of gray matter is questionable, the feat of getting a brain to interface with cybernetics is impressive.
+	HealthBarExtension: XP-00 Hypnos
+}
 
 BossChecklist: {
 	Hypnos: {
@@ -22,10 +25,6 @@ BossChecklist: {
 		SpawnInfo: Jam a [i:CalamityMod/BloodyVein] into the Codebreaker.
 		Flavor: An imperfection after all… what a shame.
 	}
-}
-
-Hypnos: {
-	HealthBarExtension: XP-00 Hypnos
 }
 
 // Emote

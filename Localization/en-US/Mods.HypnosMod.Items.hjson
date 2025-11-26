@@ -34,11 +34,11 @@ Neuraze: {
 }
 
 Planetarium: {
-	Tooltip: 
-	'''
-	Countless shooting stars streak across the sky tonight...
-	Should you choose the right one...
-	...it will carry your wish to thousands of distant worlds.
-	'''
+	Tooltip:
+		'''
+		Countless shooting stars streak across the sky tonight...
+		Should you choose the right one...
+		...it will carry your wish to thousands of distant worlds.
+		'''
 	DisplayName: Planetarium
 }

@@ -960,7 +960,7 @@ namespace HypnosMod.HypnosNPCs
         {
         }
 
-        internal float WidthFunction(float completionRatio) 
+        internal float WidthFunction(float completionRatio, Vector2 v) 
         {
             float ratio = 0.9f;
             if ((hypnos.ai[2] < 120 && hypnos.ai[0] == 6 && NPC.ai[1] >= 4) || (hypnos.ai[2] < 60 && hypnos.ai[0] == 6 && NPC.ai[1] < 4))
@@ -982,11 +982,11 @@ namespace HypnosMod.HypnosNPCs
             return ratio;
         }
 
-        internal float BackgroundWidthFunction(float completionRatio) => WidthFunction(completionRatio) * 4f;
+        internal float BackgroundWidthFunction(float completionRatio, Vector2 v) => WidthFunction(completionRatio, v) * 4f;
 
-        public Color BackgroundColorFunction(float completionRatio) => hypnos.ModNPC<HypnosBoss>().ragetimer > 0 ? Color.IndianRed * 0.4f : Color.CornflowerBlue * 0.4f;
+        public Color BackgroundColorFunction(float completionRatio, Vector2 v) => hypnos.ModNPC<HypnosBoss>().ragetimer > 0 ? Color.IndianRed * 0.4f : Color.CornflowerBlue * 0.4f;
 
-        internal Color ColorFunction(float completionRatio)
+        internal Color ColorFunction(float completionRatio, Vector2 v)
         {
             Color baseColor1 = Color.Cyan;
             Color baseColor2 = Color.Cyan;

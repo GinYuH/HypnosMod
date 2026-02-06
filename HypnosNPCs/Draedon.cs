@@ -47,7 +47,7 @@ namespace HypnosMod.HypnosNPCs
 
         private void NewText(string text, Color textColor)
         {
-            CalamityUtils.DisplayLocalizedText(text, textColor);
+            CalamityUtils.BroadcastLocalizedText(text, textColor);
         }
 
         public int PlayerWhoAmI
